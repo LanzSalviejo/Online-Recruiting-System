@@ -105,6 +105,7 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
     def _calculate_skills_score(self, application):
         # Implementation of skills matching logic
         # Returns score between 0-20
+        return 1
 
 class ReportViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAdminUser]
