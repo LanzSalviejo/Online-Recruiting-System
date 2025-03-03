@@ -31,6 +31,13 @@ class JobPosting(models.Model):
         ('CONTRACT', 'Contract'),
         ('COOP', 'Co-op')
     )
+    EDUCATION_TYPES = (
+        ('MASTERS', 'Masters'),
+        ('BACHELORS','Bachelors'),
+        ('ASSOCIATE','Associate'),
+        ('CERTIFICATE','Certificate'),
+        ('HIGH_SCHOOL','High School')
+    )
 
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
@@ -38,7 +45,7 @@ class JobPosting(models.Model):
     category = models.ForeignKey(JobCategory, on_delete=models.CASCADE)
     location = models.CharField(max_length=100)
     contact_email = models.EmailField()
-    min_education_level = models.CharField(max_length=100)
+    min_education_level = models.CharField(max_length=100,choices=EDUCATION_TYPES)
     min_experience_years = models.PositiveIntegerField()
     job_description = models.TextField()
     salary_range_min = models.DecimalField(max_digits=10, decimal_places=2)
@@ -54,6 +61,15 @@ class JobPreference(models.Model):
 
 
 class UserEducation(models.Model):
+    EDUCATION_TYPES = (
+        ('MASTERS', 'Masters'),
+        ('BACHELORS','Bachelors'),
+        ('ASSOCIATE','Associate'),
+        ('CERTIFICATE','Certificate'),
+        ('HIGH_SCHOOL','High School')
+    )
+
+    education_level = models.CharField(max_length=100,choices=EDUCATION_TYPES)
 
 
 class UserExperience(models.Model):
