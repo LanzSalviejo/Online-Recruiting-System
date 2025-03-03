@@ -94,6 +94,39 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
         
         # Implementation of education scoring logic
         # Returns score between 0-40
+        #Exceeds required = 40, Meets required = 30,One level below = 15 
+        exceeds = 40.0, meets = 30.0, below = 15.0
+        if(required_level == applicant_education.education_level): # Checks if required level is equal to applicant level
+            return meets
+
+        match required_level: #Determines if applicant is "above" or "below" the required level and assigns a score
+            case 'Masters':
+                if(applicant_education.education_level == 'Bachelor'):
+                    return 15
+                else: return 0
+            case 'Bachelor':
+                if(applicant_education.education_level == 'Associate'):
+                    return below
+                elif(applicant_education.education_level == 'Masters'):
+                    return exceeds
+                else: return 0
+            case 'Associate':
+                if(applicant_education.education_level == 'Certificate'):
+                    return below
+                elif(applicant_education.education_level == 'Bachelor'):
+                    return exceeds
+                else: return 0
+            case 'Certificate':
+                if(applicant_education.education_level == 'High School'):
+                    return below
+                elif(applicant_education.education_level == 'Associate'):
+                    return exceeds
+                else: return 0
+            case 'High School':
+                if(applicant_education.education_level == 'Certificate')
+                    return exceeds
+                else: return 0
+
 
     def _calculate_experience_score(self, application):
         required_years = application.job_posting.min_experience_years
@@ -101,11 +134,20 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
         
         # Implementation of experience scoring logic
         # Returns score between 0-40
+        penalty_value = (required_years - applicant_experience) # Determines difference of candidate experience years vs required years
+        if(penalty_value > 5): # Means required experience is much more than candidate has
+            penalty_value = 5 
+        if(penalty_value < 0): # Means candidate experience is much higher than required
+            penalty_value = 0 
+        score = 40.0 - (penalty_value*8) #penalty_value is always between 0 - 5
+        return score
 
-    def _calculate_skills_score(self, application):
+
+    def _calculate_skills_score(self, application): # There is no skill values in database for both users and applications, do not know how to calculate
         # Implementation of skills matching logic
         # Returns score between 0-20
-        return 1
+        return 20
+        
 
 class ReportViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAdminUser]
