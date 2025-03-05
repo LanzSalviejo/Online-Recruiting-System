@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Applicant Dashboard - ORS{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2>Welcome, {{ user.firstName }} {{ user.lastName }}</h2>
+    <div class="profile-section">
+        <h3>Your Profile</h3>
+        <p>Email: {{ user.emailAddress }}</p>
+        <p>Education: {{ applicant.education }}</p>
+        <p>Work Experience: {{ applicant.workExperience }} years</p>
+        <a href="{% url 'modify_profile' %}">Edit Profile</a>
+    </div>
+    <div class="applications-section">
+        <h3>Your Applications</h3>
+        <ul>
+            {% for application in applications %}
+            <li>
+                <strong>{{ application.postID.title }}</strong> - {{ application.status }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="recommendations-section">
+        <h3>Recommended Jobs</h3>
+        <ul>
+            {% for job in recommended_jobs %}
+            <li>
+                <strong>{{ job.title }}</strong> - {{ job.location }}
+                <a href="{% url 'apply_job' job.postID %}">Apply</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

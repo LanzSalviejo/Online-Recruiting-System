@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - ORS{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2>Welcome, {{ user.firstName }} {{ user.lastName }}</h2>
+    <div class="manage-categories-section">
+        <h3>Manage Job Categories</h3>
+        <form method="post" action="{% url 'add_category' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="category">Category Name</label>
+                <input type="text" id="category" name="category" required>
+            </div>
+            <button type="submit">Add Category</button>
+        </form>
+        <ul>
+            {% for category in categories %}
+            <li>
+                {{ category }}
+                <a href="{% url 'delete_category' category %}">Delete</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="generate-reports-section">
+        <h3>Generate Reports</h3>
+        <a href="{% url 'generate_monthly_report' %}">Monthly Report</a>
+        <a href="{% url 'generate_yearly_report' %}">Yearly Report</a>
+    </div>
+</div>
+{% endblock %}

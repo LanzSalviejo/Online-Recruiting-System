@@ -1,0 +1,21 @@
+<!-- recruiting/templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Online Recruiting System{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <!-- Load React components -->
+    <script src="{% static 'js/components.js' %}"></script>
+    <script src="{% static 'js/services.js' %}"></script>
+    {% block page_scripts %}{% endblock %}
+</body>
+</html>

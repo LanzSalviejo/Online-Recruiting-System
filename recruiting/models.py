@@ -1,17 +1,47 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
 import os
 import json
 from datetime import datetime
 
+class CustomUserManager(BaseUserManager):
+    def create_user(self, emailAddress, password=None, **extra_fields):
+        """
+        Creates and saves a User with the given emailAddress and password.
+        """
+        if not emailAddress:
+            raise ValueError('The EmailAddress field must be set')
+        
+        emailAddress = self.normalize_email(emailAddress)
+        user = self.model(emailAddress=emailAddress, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, emailAddress, password=None, **extra_fields):
+        """
+        Creates and saves a superuser with the given emailAddress and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(emailAddress, password, **extra_fields)
+
 class User(AbstractUser):
     """
     Base user model that extends Django's AbstractUser.
     Serves as the parent class for Applicant, HR Staff, and Administrator.
     """
-    # Fields directly from diagram
+    username = None
+
     userID = models.AutoField(primary_key=True)
     firstName = models.CharField(max_length=50)
     lastName = models.CharField(max_length=50)
@@ -21,9 +51,10 @@ class User(AbstractUser):
     accountType = models.CharField(max_length=20)
     imagePath = models.CharField(max_length=255, blank=True)
     
-    # Override Django's default fields to match our custom fields
     USERNAME_FIELD = 'emailAddress'
     REQUIRED_FIELDS = ['firstName', 'lastName']
+    
+    objects = CustomUserManager()
     
     def login(self, request, password):
         """User login method"""
@@ -580,7 +611,7 @@ class JobPreferences(models.Model):
     """
     Job Preferences model for storing applicant job preferences.
     """
-    userID = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     positionType = models.CharField(max_length=50)
     category = models.CharField(max_length=50)
     location = models.CharField(max_length=100)
@@ -588,7 +619,7 @@ class JobPreferences(models.Model):
     
     def addPreference(cls, user, position_type, category, location, salary):
         """Method to add a job preference (class method)"""
-        preference, created = cls.objects.get_or_create(userID=user)
+        preference, created = cls.objects.get_or_create(user=user)
         
         preference.positionType = position_type
         preference.category = category
