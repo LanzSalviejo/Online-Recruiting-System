@@ -16,7 +16,7 @@ import ResetPassword from './pages/auth/ResetPassword';
 // Public pages
 import Home from './pages/Home';
 import JobListings from './pages/jobs/JobListings';
-import JobDetails from './pages/jobs/JobDetailsPage';
+import JobDetails from './pages/jobs/JobDetails';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
@@ -25,10 +25,6 @@ import FAQ from './pages/FAQ';
 import ApplicantDashboard from './pages/applicant/Dashboard';
 import MyApplications from './pages/applicant/MyApplications';
 import ApplicationDetails from './pages/applicant/ApplicationDetails';
-import ProfilePage from './pages/profile/ProfilePage';
-import EducationForm from './pages/profile/EducationForm';
-import ExperienceForm from './pages/profile/ExperienceForm';
-import PreferencesForm from './pages/profile/PreferencesForm';
 
 // HR pages
 import HRDashboard from './pages/hr/Dashboard';
@@ -47,6 +43,12 @@ import HRApprovals from './pages/admin/HRApprovals';
 import Reports from './pages/admin/Reports';
 import CategoryReport from './pages/admin/CategoryReport';
 import QualificationReport from './pages/admin/QualificationReport';
+
+// Profile pages
+import ProfilePage from './pages/profile/ProfilePage';
+import EducationForm from './pages/profile/EducationForm';
+import ExperienceForm from './pages/profile/ExperienceForm';
+import PreferencesForm from './pages/profile/PreferencesForm';
 
 // Helpers
 import PrivateRoute from './components/auth/PrivateRoute';
