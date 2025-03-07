@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import JobSearch from '../components/job/JobSearch';
-import JobCard from '../components/job/JobCard';
+import { useLocation, useNavigate } from 'react-router-dom';
+import JobSearch from '../../components/job/JobSearch';
+import JobCard from '../../components/job/JobCard';
 import { ArrowUp } from 'lucide-react';
+import api from '../../services/api';
 
 const JobListings = () => {
   const [jobs, setJobs] = useState([]);
@@ -17,158 +19,93 @@ const JobListings = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalJobs, setTotalJobs] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+  const JOBS_PER_PAGE = 6;
 
-  // Mock job data for demonstration
-  const mockJobs = [
-    {
-      _id: '1',
-      title: 'Frontend Developer',
-      companyName: 'Tech Solutions',
-      location: 'Vancouver, BC',
-      positionType: 'Full Time',
-      categoryName: 'Information Technology',
-      salary: 90000,
-      description: 'We are seeking a skilled Frontend Developer to join our team. You will be responsible for building user interfaces using modern web technologies.',
-      postDate: new Date('2025-01-15'),
-      dueDate: new Date('2025-03-15')
-    },
-    {
-      _id: '2',
-      title: 'UX/UI Designer',
-      companyName: 'Creative Studio',
-      location: 'Toronto, ON',
-      positionType: 'Full Time',
-      categoryName: 'Design',
-      salary: 85000,
-      description: 'Looking for a talented UX/UI Designer to create intuitive and engaging user experiences for our clients across multiple platforms.',
-      postDate: new Date('2025-01-20'),
-      dueDate: new Date('2025-03-10')
-    },
-    {
-      _id: '3',
-      title: 'Marketing Specialist',
-      companyName: 'Global Brands Inc.',
-      location: 'Remote',
-      positionType: 'Part Time',
-      categoryName: 'Marketing',
-      salary: 65000,
-      description: 'Join our marketing team to develop and implement marketing strategies across digital channels.',
-      postDate: new Date('2025-02-01'),
-      dueDate: new Date('2025-03-20')
-    },
-    {
-      _id: '4',
-      title: 'Backend Developer',
-      companyName: 'Innovate Systems',
-      location: 'Montreal, QC',
-      positionType: 'Contract',
-      categoryName: 'Information Technology',
-      salary: 95000,
-      description: 'Experienced Backend Developer needed to work on our cloud-based applications using modern server technologies.',
-      postDate: new Date('2025-01-25'),
-      dueDate: new Date('2025-03-25')
-    },
-    {
-      _id: '5',
-      title: 'Accountant',
-      companyName: 'Financial Services Ltd.',
-      location: 'Calgary, AB',
-      positionType: 'Full Time',
-      categoryName: 'Finance',
-      salary: 75000,
-      description: 'We are looking for a detailed-oriented Accountant to join our financial team. CPA designation preferred.',
-      postDate: new Date('2025-02-05'),
-      dueDate: new Date('2025-04-05')
-    },
-    {
-      _id: '6',
-      title: 'Content Writer',
-      companyName: 'Digital Media Co.',
-      location: 'Ottawa, ON',
-      positionType: 'Part Time',
-      categoryName: 'Marketing',
-      salary: 60000,
-      description: 'Creative Content Writer needed to produce engaging content for various digital platforms.',
-      postDate: new Date('2025-02-10'),
-      dueDate: new Date('2025-03-31')
-    }
-  ];
+  // Extract search params from URL on initial load
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const urlFilters = {
+      keyword: searchParams.get('keyword') || '',
+      location: searchParams.get('location') || '',
+      category: searchParams.get('category') || '',
+      positionType: searchParams.get('positionType') || '',
+      minSalary: searchParams.get('minSalary') || '',
+      dueDate: searchParams.get('dueDate') || ''
+    };
+    
+    setFilters(urlFilters);
+    
+    const page = parseInt(searchParams.get('page')) || 1;
+    setCurrentPage(page);
+  }, [location.search]);
 
-  // Simulating API fetch
+  // Fetch jobs from the API
   useEffect(() => {
     const fetchJobs = async () => {
       try {
         setLoading(true);
         
-        // Simulating backend filtering and pagination logic
-        let filteredJobs = [...mockJobs];
+        // Build query params for API request
+        const queryParams = new URLSearchParams();
         
-        // Apply filters
-        if (filters.keyword) {
-          const keyword = filters.keyword.toLowerCase();
-          filteredJobs = filteredJobs.filter(job => 
-            job.title.toLowerCase().includes(keyword) || 
-            job.description.toLowerCase().includes(keyword) ||
-            job.companyName.toLowerCase().includes(keyword)
-          );
-        }
+        // Add filters to query params
+        if (filters.keyword) queryParams.append('keyword', filters.keyword);
+        if (filters.location) queryParams.append('location', filters.location);
+        if (filters.category) queryParams.append('category', filters.category);
+        if (filters.positionType) queryParams.append('positionType', filters.positionType);
+        if (filters.minSalary) queryParams.append('minSalary', filters.minSalary);
+        if (filters.dueDate) queryParams.append('dueDate', filters.dueDate);
         
-        if (filters.location) {
-          const location = filters.location.toLowerCase();
-          filteredJobs = filteredJobs.filter(job => 
-            job.location.toLowerCase().includes(location)
-          );
-        }
+        // Add pagination params
+        queryParams.append('page', currentPage);
+        queryParams.append('limit', JOBS_PER_PAGE);
         
-        if (filters.category) {
-          filteredJobs = filteredJobs.filter(job => 
-            job.categoryName === filters.category
-          );
-        }
+        // Make API request
+        const response = await api.get(`/jobs?${queryParams.toString()}`);
         
-        if (filters.positionType) {
-          filteredJobs = filteredJobs.filter(job => 
-            job.positionType === filters.positionType
-          );
-        }
-        
-        if (filters.minSalary) {
-          const minSalary = parseInt(filters.minSalary);
-          filteredJobs = filteredJobs.filter(job => 
-            job.salary >= minSalary
-          );
-        }
-        
-        if (filters.dueDate) {
-          const dueDate = new Date(filters.dueDate);
-          filteredJobs = filteredJobs.filter(job => 
-            new Date(job.dueDate) >= dueDate
-          );
-        }
-        
-        // Calculate pagination
-        const jobsPerPage = 4;
-        const totalItems = filteredJobs.length;
-        const totalPages = Math.ceil(totalItems / jobsPerPage);
-        
-        // Get current page items
-        const startIndex = (currentPage - 1) * jobsPerPage;
-        const endIndex = Math.min(startIndex + jobsPerPage, totalItems);
-        const paginatedJobs = filteredJobs.slice(startIndex, endIndex);
-        
-        setJobs(paginatedJobs);
-        setTotalPages(totalPages);
+        // Update state with response data
+        setJobs(response.data.jobs);
+        setTotalPages(response.data.totalPages);
+        setTotalJobs(response.data.totalJobs);
         setLoading(false);
-      } catch (error) {
-        console.error('Error fetching jobs:', error);
-        setError('Failed to fetch jobs. Please try again later.');
+      } catch (err) {
+        console.error('Error fetching jobs:', err);
+        setError('Failed to load jobs. Please try again later.');
         setLoading(false);
       }
     };
     
     fetchJobs();
   }, [filters, currentPage]);
+
+  // Update URL with current filters and pagination
+  useEffect(() => {
+    const queryParams = new URLSearchParams();
+    
+    // Add non-empty filters to URL
+    if (filters.keyword) queryParams.set('keyword', filters.keyword);
+    if (filters.location) queryParams.set('location', filters.location);
+    if (filters.category) queryParams.set('category', filters.category);
+    if (filters.positionType) queryParams.set('positionType', filters.positionType);
+    if (filters.minSalary) queryParams.set('minSalary', filters.minSalary);
+    if (filters.dueDate) queryParams.set('dueDate', filters.dueDate);
+    
+    // Add current page to URL if not the first page
+    if (currentPage > 1) {
+      queryParams.set('page', currentPage);
+    }
+    
+    // Update URL without causing a refresh
+    const queryString = queryParams.toString();
+    const newUrl = queryString ? `?${queryString}` : '';
+    
+    navigate(newUrl, { replace: true });
+  }, [filters, currentPage, navigate]);
 
   // Handle search form submission
   const handleSearch = (searchFilters) => {
@@ -202,7 +139,7 @@ const JobListings = () => {
     <div className="page-container">
       <h1 className="page-title">Job Listings</h1>
       
-      <JobSearch onSearch={handleSearch} />
+      <JobSearch onSearch={handleSearch} initialFilters={filters} />
       
       {loading ? (
         <div className="loading-container">
@@ -223,7 +160,7 @@ const JobListings = () => {
       ) : (
         <>
           <div className="results-count">
-            Showing {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'}
+            Showing {jobs.length} of {totalJobs} {totalJobs === 1 ? 'job' : 'jobs'}
           </div>
           
           <div className="job-grid">
