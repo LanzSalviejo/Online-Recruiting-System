@@ -16,6 +16,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/applicant', require('./routes/applicant'));
 app.use('/api/jobs', require('./routes/jobs'));
 app.use('/api/hr', require('./routes/hr'));
+app.use('/api/profile', require('./routes/profile')); 
 app.use('/api', require('./routes/home'));
 
 // Serve static assets in production
