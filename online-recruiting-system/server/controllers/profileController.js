@@ -4,6 +4,7 @@ const JobPreference = require('../models/JobPreference');
 const User = require('../models/User');
 const path = require('path');
 const fs = require('fs');
+const jobMatchingService = require('../services/jobMatchingService');
 
 // Helper function to handle file upload
 const handleFileUpload = (file, userId) => {
@@ -339,6 +340,17 @@ exports.addJobPreference = async (req, res) => {
     
     const newPreference = await JobPreference.create(preferenceData);
     
+    // Trigger matching process asynchronously
+    setTimeout(() => {
+      jobMatchingService.processNewPreferenceMatching(userId, newPreference.id)
+        .then(matchResults => {
+          console.log(`Preference matching completed for user ${userId}: ${matchResults.totalMatches} matching jobs found`);
+        })
+        .catch(error => {
+          console.error('Error in background preference matching:', error);
+        });
+    }, 0);
+    
     res.status(201).json({ 
       success: true, 
       message: 'Job preference added successfully',
@@ -367,6 +379,17 @@ exports.updateJobPreference = async (req, res) => {
     if (!updatedPreference) {
       return res.status(404).json({ success: false, message: 'Job preference record not found' });
     }
+    
+    // Trigger matching process asynchronously
+    setTimeout(() => {
+      jobMatchingService.processNewPreferenceMatching(userId, preferenceId)
+        .then(matchResults => {
+          console.log(`Preference matching completed after update for user ${userId}: ${matchResults.totalMatches} matching jobs found`);
+        })
+        .catch(error => {
+          console.error('Error in background preference matching after update:', error);
+        });
+    }, 0);
     
     res.status(200).json({ 
       success: true, 

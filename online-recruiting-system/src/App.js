@@ -248,6 +248,36 @@ function App() {
                 </PrivateRoute>
               } 
             />
+            <Route 
+              path="/reports" 
+              element={
+                <PrivateRoute>
+                  <RoleRoute allowedRoles={['admin']}>
+                    <Reports />
+                  </RoleRoute>
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/reports/category" 
+              element={
+                <PrivateRoute>
+                  <RoleRoute allowedRoles={['admin']}>
+                    <CategoryReport />
+                  </RoleRoute>
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/reports/qualification" 
+              element={
+                <PrivateRoute>
+                  <RoleRoute allowedRoles={['admin']}>
+                    <QualificationReport />
+                  </RoleRoute>
+                </PrivateRoute>
+              } 
+            />
             
             {/* Profile Routes - accessible by all logged in users */}
             <Route 
