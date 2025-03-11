@@ -139,9 +139,9 @@ class JobMatchingService {
           const notificationQuery = `
             INSERT INTO notifications (
               user_id,
-              type,
+              typen,
               title,
-              message,
+              messageData,
               related_id,
               is_read,
               created_at
@@ -386,9 +386,9 @@ class JobMatchingService {
           const notificationQuery = `
             INSERT INTO notifications (
               user_id,
-              type,
+              typen,
               title,
-              message,
+              messageData,
               related_id,
               is_read,
               created_at
