@@ -37,3 +37,15 @@ CREATE TABLE IF NOT EXISTS hr_staff (
   is_approved BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+--Create notifications table
+CREATE TABLE IF NOT EXISTS notifications (
+  id SERIAL PRIMARY KEY,
+  user_id  INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, 
+  typen VARCHAR(30), NOT NULL CHECK (typen IN ('screen', 'hr', 'jobmatch')),
+  title VARCHAR(30),
+  messageData VARCHAR(100),
+  related_id VARCHAR(50),
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
