@@ -1,70 +1,164 @@
-# Getting Started with Create React App
+## Technology Stack
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- **Frontend:** React, React Router, Axios
+- **Backend:** Node.js, Express
+- **Database:** PostgreSQL
+- **Authentication:** JWT (JSON Web Tokens)
+- **Email Service:** Nodemailer
+- **UI Components:** Custom components + Lucide React icons
 
-## Available Scripts
+## Installation
 
-In the project directory, you can run:
+### Prerequisites
 
-### `npm start`
+- Node.js (v16 or higher)
+- npm (v8 or higher)
+- PostgreSQL (v12 or higher)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Database Setup
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1. Create a PostgreSQL database for the application:
 
-### `npm test`
+```sql
+CREATE DATABASE online_recruiting_system;
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. Create a PostgreSQL user with appropriate permissions:
 
-### `npm run build`
+```sql
+CREATE USER recruiter WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE online_recruiting_system TO recruiter;
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Backend Setup
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Navigate to the server directory:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+cd online-recruiting-system/server
+```
 
-### `npm run eject`
+2. Install dependencies:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+npm install
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. Configure environment variables by editing the `.env` file or creating one in the server folder:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+# Server Configuration
+PORT=5000
+NODE_ENV=development
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+# PostgreSQL Configuration
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=online_recruiting_system
 
-## Learn More
+# JWT Configuration
+JWT_SECRET=your_jwt_secret_key_should_be_long_and_complex
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Frontend URL (for email links)
+FRONTEND_URL=http://localhost:3000
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+# Email Configuration
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USERNAME=your_email_username
+EMAIL_PASSWORD=your_email_password
+EMAIL_FROM_NAME=Online Recruiting System
+EMAIL_FROM_ADDRESS=noreply@example.com
+```
 
-### Code Splitting
+4. Initialize the database schema:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+psql -U postgres -d online_recruiting_system -f ./config/schema.sql
+psql -U postgres -d online_recruiting_system -f ./config/job_schema.sql
+psql -U postgres -d online_recruiting_system -f ./migrations/create_notifications_table.sql
+psql -U postgres -d online_recruiting_system -f ./migrations/add_screening_fields.sql
+```
 
-### Analyzing the Bundle Size
+5. Start the server:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+npm start
+```
 
-### Making a Progressive Web App
+The server should now be running on http://localhost:5000.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Frontend Setup
 
-### Advanced Configuration
+1. Navigate to the project root directory:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+cd online-recruiting-system
+```
 
-### Deployment
+2. Install dependencies:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+npm install
+```
 
-### `npm run build` fails to minify
+3. Configure the API endpoint by creating a `.env` file:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+REACT_APP_API_URL=http://localhost:5000/api
+```
+
+4. Start the development server:
+
+```bash
+npm start
+```
+
+The application should now be running at http://localhost:3000.
+
+## Development
+
+### Available Scripts
+
+- `npm start` - Runs the app in development mode
+- `npm test` - Runs the test suite
+- `npm run build` - Builds the app for production
+- `npm run eject` - Ejects from create-react-app
+
+## Deployment
+
+### Backend Deployment
+
+1. Set environment variables for production
+2. Build the server:
+
+```bash
+npm run build
+```
+
+3. Start the server:
+
+```bash
+npm run start:prod
+```
+
+### Frontend Deployment
+
+1. Build the React application:
+
+```bash
+npm run build
+```
+
+2. Deploy the contents of the `build` directory to your web server or hosting service
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
