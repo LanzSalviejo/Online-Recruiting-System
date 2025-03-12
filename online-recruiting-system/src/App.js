@@ -16,7 +16,7 @@ import ResetPassword from './pages/auth/ResetPassword';
 // Public pages
 import Home from './pages/Home';
 import JobListings from './pages/jobs/JobListings';
-import JobDetails from './pages/jobs/JobDetails';
+import JobDetails from './pages/jobs/JobDetailsPage';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
