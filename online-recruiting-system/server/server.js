@@ -1,11 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./config/db');
+const pool = require('./config/db');
 const path = require('path');
 const app = express();
-
-// Connect to Database
-connectDB();
 
 // Init Middleware
 app.use(cors());
@@ -16,7 +13,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/applicant', require('./routes/applicant'));
 app.use('/api/jobs', require('./routes/jobs'));
 app.use('/api/hr', require('./routes/hr'));
-app.use('/api/profile', require('./routes/profile')); 
+app.use('/api/profile', require('./routes/profileRoutes'));
 app.use('/api/screening', require('./routes/screening'));
 app.use('/api/matching', require('./routes/matching'));
 app.use('/api/notifications', require('./routes/notifications'));
