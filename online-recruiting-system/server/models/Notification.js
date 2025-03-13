@@ -12,9 +12,9 @@ const Notification = {
   create: async (notificationData) => {
     const {
       userId,
-      type,
+      typen,
       title,
-      message,
+      messageData,
       relatedId = null,
       isRead = false
     } = notificationData;
@@ -22,9 +22,9 @@ const Notification = {
     const query = `
       INSERT INTO notifications (
         user_id,
-        type,
+        typen,
         title,
-        message,
+        messageData,
         related_id,
         is_read,
         created_at
@@ -32,7 +32,7 @@ const Notification = {
       RETURNING *
     `;
     
-    const values = [userId, type, title, message, relatedId, isRead];
+    const values = [userId, typen, title, messageData, relatedId, isRead];
     const result = await pool.query(query, values);
     
     return result.rows[0];
@@ -61,7 +61,7 @@ const Notification = {
       limit = 20,
       offset = 0,
       unreadOnly = false,
-      type = null
+      typen = null
     } = options;
     
     let query = `SELECT * FROM notifications WHERE user_id = $1`;
@@ -72,9 +72,9 @@ const Notification = {
       query += ` AND is_read = false`;
     }
     
-    if (type) {
-      query += ` AND type = $${paramIndex}`;
-      params.push(type);
+    if (typen) {
+      query += ` AND typen = $${paramIndex}`;
+      params.push(typen);
       paramIndex++;
     }
     
