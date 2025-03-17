@@ -2,12 +2,15 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const auth = require('../middleware/auth');
 const User = require('../models/User');
 const Applicant = require('../models/Applicant');
 const HRStaff = require('../models/HRStaff');
 const sendEmail = require('../utils/sendEmail');
+const pool = require('../config/db');
+
 require('dotenv').config();
 
 // @route   POST api/auth/register
@@ -97,11 +100,21 @@ router.post(
         // Sign token
         jwt.sign(
           payload,
-          process.env.JWT_SECRET,
+          process.env.JWT_SECRET || 'defaultsecretkey',
           { expiresIn: '24h' },
           (err, token) => {
             if (err) throw err;
-            res.json({ token });
+            res.json({ 
+              token,
+              user: {
+                id: user.id,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                email: user.email,
+                accountType: user.account_type,
+                imagePath: user.image_path
+              } 
+            });
           }
         );
       } catch (error) {
@@ -117,17 +130,28 @@ router.post(
 
         jwt.sign(
           payload,
-          process.env.JWT_SECRET,
+          process.env.JWT_SECRET || 'defaultsecretkey',
           { expiresIn: '24h' },
           (err, token) => {
             if (err) throw err;
-            res.json({ token, message: 'Registration successful but verification email could not be sent.' });
+            res.json({ 
+              token,
+              user: {
+                id: user.id,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                email: user.email,
+                accountType: user.account_type,
+                imagePath: user.image_path
+              },
+              message: 'Registration successful but verification email could not be sent.' 
+            });
           }
         );
       }
     } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
+      console.error('Registration error:', err);
+      res.status(500).json({ message: 'Server error during registration' });
     }
   }
 );
@@ -142,6 +166,8 @@ router.post(
     check('password', 'Password is required').exists()
   ],
   async (req, res) => {
+    console.log('Login request received:', req.body);
+    
     // Validate request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -151,30 +177,44 @@ router.post(
     const { email, password } = req.body;
 
     try {
+      console.log('Finding user by email:', email);
+      
       // Check if user exists
       const user = await User.findByEmail(email);
       if (!user) {
-        return res.status(400).json({ message: 'Invalid credentials' });
+        console.log('User not found');
+        return res.status(401).json({ message: 'Invalid credentials' });
       }
+      
+      console.log('User found, checking if active');
 
       // Check if user is active
       if (!user.is_active) {
+        console.log('User account is deactivated');
         return res.status(401).json({ message: 'Your account has been deactivated. Please contact support.' });
       }
+      
+      console.log('Checking password match');
 
       // Check if password matches
       const isMatch = await User.comparePassword(password, user.password);
       if (!isMatch) {
-        return res.status(400).json({ message: 'Invalid credentials' });
+        console.log('Password does not match');
+        return res.status(401).json({ message: 'Invalid credentials' });
       }
+      
+      console.log('Password matches, checking HR approval if needed');
 
       // For HR accounts, check if approved
       if (user.account_type === 'hr') {
         const hrStaff = await HRStaff.findByUserId(user.id);
         if (hrStaff && !hrStaff.is_approved) {
+          console.log('HR account not approved');
           return res.status(401).json({ message: 'Your HR account is pending approval.' });
         }
       }
+      
+      console.log('Creating JWT payload');
 
       // Create JWT payload
       const payload = {
@@ -183,14 +223,22 @@ router.post(
           accountType: user.account_type
         }
       };
+      
+      console.log('Signing token');
 
       // Sign token
       jwt.sign(
         payload,
-        process.env.JWT_SECRET,
+        process.env.JWT_SECRET || 'defaultsecretkey',
         { expiresIn: '24h' },
         (err, token) => {
-          if (err) throw err;
+          if (err) {
+            console.error('Token signing error:', err);
+            throw err;
+          }
+          
+          console.log('Login successful, returning token and user data');
+          
           res.json({ 
             token, 
             user: {
@@ -205,8 +253,8 @@ router.post(
         }
       );
     } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
+      console.error('Login error:', err);
+      res.status(500).json({ message: 'Server error during login' });
     }
   }
 );
@@ -216,14 +264,30 @@ router.post(
 // @access  Private
 router.get('/me', auth, async (req, res) => {
   try {
+    console.log('Get current user request received for user ID:', req.user.id);
+    
     const user = await User.findById(req.user.id);
     if (!user) {
+      console.log('User not found');
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json(user);
+    
+    console.log('User found, returning user data');
+    
+    res.json({
+      id: user.id,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      email: user.email,
+      accountType: user.account_type,
+      isActive: user.is_active,
+      isVerified: user.is_verified,
+      imagePath: user.image_path,
+      createdAt: user.created_at
+    });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('Error getting current user:', err);
+    res.status(500).json({ message: 'Server error retrieving user profile' });
   }
 });
 
@@ -280,8 +344,8 @@ router.post(
         return res.status(500).json({ message: 'Email could not be sent' });
       }
     } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
+      console.error('Error during password reset request:', err);
+      res.status(500).json({ message: 'Server error during password reset request' });
     }
   }
 );
@@ -328,8 +392,8 @@ router.put(
 
       res.json({ message: 'Password has been reset' });
     } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
+      console.error('Error during password reset:', err);
+      res.status(500).json({ message: 'Server error during password reset' });
     }
   }
 );
@@ -356,10 +420,10 @@ router.get('/verify/:token', async (req, res) => {
     await User.verifyUser(user.id);
 
     // Redirect to frontend verification success page
-    res.redirect(`${process.env.FRONTEND_URL}/verification-success`);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/verification-success`);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('Error during email verification:', err);
+    res.status(500).json({ message: 'Server error during email verification' });
   }
 });
 

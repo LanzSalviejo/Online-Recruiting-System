@@ -49,6 +49,7 @@ export const AuthProvider = ({ children }) => {
       setUser(user);
       return user;
     } catch (err) {
+      console.error('Login error details:', err);
       setError(err.response?.data?.message || 'Login failed');
       throw err;
     }

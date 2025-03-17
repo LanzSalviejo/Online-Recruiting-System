@@ -1,11 +1,12 @@
 ## Technology Stack
 
-- **Frontend:** React, React Router, Axios
+- **Frontend:** React 19, React Router 7, Axios
 - **Backend:** Node.js, Express
 - **Database:** PostgreSQL
 - **Authentication:** JWT (JSON Web Tokens)
 - **Email Service:** Nodemailer
 - **UI Components:** Custom components + Lucide React icons
+- **Charting:** Recharts for data visualization
 
 ## Installation
 
@@ -44,7 +45,7 @@ cd online-recruiting-system/server
 npm install
 ```
 
-3. Configure environment variables by editing the `.env` file or creating one in the server folder:
+3. Configure environment variables by creating a `.env` file in the server folder:
 
 ```
 # Server Configuration
@@ -121,6 +122,45 @@ The application should now be running at http://localhost:3000.
 
 ## Development
 
+### Project Structure
+
+```
+online-recruiting-system/
+├── public/                   # Static files
+├── src/                      # Frontend source code
+│   ├── components/           # Reusable components
+│   │   ├── admin/            # Admin-specific components
+│   │   ├── applicant/        # Applicant-specific components
+│   │   ├── hr/               # HR-specific components
+│   │   ├── layouts/          # Layout components
+│   │   └── common/           # Shared components
+│   ├── contexts/             # React contexts
+│   ├── pages/                # Page components
+│   │   ├── admin/            # Admin pages
+│   │   ├── applicant/        # Applicant pages
+│   │   ├── auth/             # Authentication pages
+│   │   ├── hr/               # HR pages
+│   │   ├── jobs/             # Job-related pages
+│   │   └── profile/          # Profile pages
+│   ├── services/             # API services
+│   ├── styles/               # CSS styles
+│   ├── utils/                # Utility functions
+│   ├── App.js                # Main application component
+│   └── index.js              # Application entry point
+├── server/                   # Backend source code
+│   ├── config/               # Configuration files
+│   ├── controllers/          # API controllers
+│   ├── middleware/           # Express middleware
+│   ├── models/               # Data models
+│   ├── routes/               # API routes
+│   ├── services/             # Business logic
+│   ├── utils/                # Utility functions
+│   └── server.js             # Server entry point
+├── .env                      # Frontend environment variables
+├── server/.env               # Backend environment variables
+└── package.json              # Project dependencies
+```
+
 ### Available Scripts
 
 - `npm start` - Runs the app in development mode
@@ -136,6 +176,7 @@ The application should now be running at http://localhost:3000.
 2. Build the server:
 
 ```bash
+cd server
 npm run build
 ```
 
@@ -154,6 +195,25 @@ npm run build
 ```
 
 2. Deploy the contents of the `build` directory to your web server or hosting service
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Issues**:
+   - Ensure PostgreSQL is running
+   - Verify database credentials in the `.env` file
+   - Check that the database and tables are properly created
+
+2. **API Connection Issues**:
+   - Verify the `REACT_APP_API_URL` in the frontend `.env` file
+   - Ensure the backend server is running
+   - Check for CORS issues in the backend configuration
+
+3. **Authentication Problems**:
+   - Ensure the JWT secret is properly set
+   - Check token expiration settings
+   - Verify that the auth middleware is correctly configured
 
 ## Contributing
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { MapPin } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
   Briefcase, 

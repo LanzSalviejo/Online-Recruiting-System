@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   PieChart, 
   Pie, 
@@ -15,7 +15,9 @@ import {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#A4DE6C', '#D0ED57', '#FFC658', '#FF8C00'];
 
-const CategoryStatisticsChart = ({ data, chartType = 'pie' }) => {
+const CategoryStatisticsChart = ({ data, initialChartType = 'pie' }) => {
+  const [chartType, setChartType] = useState(initialChartType);
+  
   // Ensure data is sorted by application count descending
   const sortedData = [...data].sort((a, b) => b.totalApplications - a.totalApplications);
   
