@@ -10,7 +10,8 @@ import {
   Award, 
   Clock,
   Share2,
-  BookmarkPlus
+  BookmarkPlus,
+  Edit
 } from 'lucide-react';
 
 const JobDetail = ({ job, onApply, loading }) => {
@@ -18,19 +19,40 @@ const JobDetail = ({ job, onApply, loading }) => {
   const navigate = useNavigate();
   const [showShareOptions, setShowShareOptions] = useState(false);
 
-  // Format date to readable format
+  // If loading or no job data yet, show loading spinner
+  if (loading || !job) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p className="loading-text">Loading job details...</p>
+      </div>
+    );
+  }
+
+  // Format date to readable format - includes null checking
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    if (!dateString) return "Not specified";
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "Invalid Date";
+      
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString(undefined, options);
+    } catch (error) {
+      console.error("Date formatting error:", error);
+      return "Invalid Date";
+    }
   };
 
   const handleApplyClick = () => {
     if (!user) {
-      navigate('/login', { state: { from: `/jobs/${job._id}` } });
+      navigate('/login', { state: { from: `/jobs/${job.id || job._id}` } });
       return;
     }
     
-    onApply(job._id);
+    // Pass the correct job ID from the job object
+    onApply(job.id || job._id);
   };
 
   const shareJob = (platform) => {
@@ -66,27 +88,92 @@ const JobDetail = ({ job, onApply, loading }) => {
     // You can add a toast notification here
   };
 
-  if (!job) return <div className="loading-container"><div className="loading-spinner"></div><p className="loading-text">Loading job details...</p></div>;
+  // Normalize variable names to handle both snake_case and camelCase
+  const {
+    id = job._id,
+    title,
+    description,
+    company_name,
+    companyName,
+    location,
+    position_type,
+    positionType,
+    salary,
+    post_date,
+    postDate,
+    due_date,
+    dueDate,
+    category_name,
+    categoryName,
+    min_education_level,
+    minEducationLevel,
+    min_experience,
+    minExperience,
+    contact_email,
+    contactEmail,
+    responsibilities,
+    requirements
+  } = job;
+
+  // Use normalized variables
+  const normalizedCompanyName = company_name || companyName || "Unknown Company";
+  const normalizedPositionType = position_type || positionType || "Not specified";
+  const normalizedPostDate = post_date || postDate;
+  const normalizedDueDate = due_date || dueDate;
+  const normalizedCategoryName = category_name || categoryName || "Uncategorized";
+  const normalizedEducation = min_education_level || minEducationLevel || "Not specified";
+  const normalizedExperience = min_experience || minExperience || 0;
+  const normalizedContactEmail = contact_email || contactEmail || "Not provided";
+
+  // Parse JSON strings for responsibilities and requirements if needed
+  const parseJsonIfNeeded = (value) => {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        return value;
+      }
+    }
+    return value;
+  };
+
+  const parsedResponsibilities = parseJsonIfNeeded(responsibilities);
+  const parsedRequirements = parseJsonIfNeeded(requirements);
+
+  // Check if responsibilities is an array
+  const responsibilitiesArray = Array.isArray(parsedResponsibilities) 
+    ? parsedResponsibilities 
+    : parsedResponsibilities 
+      ? [parsedResponsibilities] 
+      : [];
+
+  // Check if requirements is an array
+  const requirementsArray = Array.isArray(parsedRequirements)
+    ? parsedRequirements
+    : parsedRequirements
+      ? [parsedRequirements]
+      : [];
 
   return (
     <div className="job-detail-container">
       <div className="job-detail-content">
         <div className="job-detail-header">
           <div className="job-detail-title-section">
-            <h1 className="job-detail-title">{job.title}</h1>
+            <h1 className="job-detail-title">{title}</h1>
+            <p className="job-company">{normalizedCompanyName}</p>
             <div className="job-meta">
               <div className="job-meta-item">
                 <Briefcase className="job-meta-icon" />
-                <span>{job.categoryName}</span>
+                <span>{normalizedCategoryName}</span>
               </div>
               <div className="job-meta-item">
                 <MapPin className="job-meta-icon" />
-                <span>{job.location}</span>
+                <span>{location}</span>
               </div>
-              {job.salary && (
+              {salary && (
                 <div className="job-meta-item">
                   <DollarSign className="job-meta-icon" />
-                  <span>${job.salary.toLocaleString()} per year</span>
+                  <span>${typeof salary === 'number' ? salary.toLocaleString() : salary} per year</span>
                 </div>
               )}
             </div>
@@ -94,13 +181,13 @@ const JobDetail = ({ job, onApply, loading }) => {
           
           <div className="job-tag-container">
             <span className={`job-tag ${
-              job.positionType === 'Full Time' 
+              normalizedPositionType === 'Full Time' 
                 ? 'job-tag-fulltime' 
-                : job.positionType === 'Part Time'
+                : normalizedPositionType === 'Part Time'
                   ? 'job-tag-parttime'
                   : 'job-tag-contract'
             }`}>
-              {job.positionType}
+              {normalizedPositionType}
             </span>
           </div>
         </div>
@@ -111,28 +198,30 @@ const JobDetail = ({ job, onApply, loading }) => {
               <Calendar className="job-metadata-icon job-metadata-icon-blue" />
               <div className="job-metadata-content">
                 <p className="job-metadata-label">Posted</p>
-                <p className="job-metadata-value">{formatDate(job.postDate)}</p>
+                <p className="job-metadata-value">{formatDate(normalizedPostDate)}</p>
               </div>
             </div>
             <div className="job-metadata-item">
               <Calendar className="job-metadata-icon job-metadata-icon-red" />
               <div className="job-metadata-content">
                 <p className="job-metadata-label">Apply Before</p>
-                <p className="job-metadata-value">{formatDate(job.dueDate)}</p>
+                <p className="job-metadata-value">{formatDate(normalizedDueDate)}</p>
               </div>
             </div>
             <div className="job-metadata-item">
               <Award className="job-metadata-icon job-metadata-icon-yellow" />
               <div className="job-metadata-content">
                 <p className="job-metadata-label">Education</p>
-                <p className="job-metadata-value">{job.minEducationLevel}</p>
+                <p className="job-metadata-value">{normalizedEducation}</p>
               </div>
             </div>
             <div className="job-metadata-item">
               <Clock className="job-metadata-icon job-metadata-icon-green" />
               <div className="job-metadata-content">
                 <p className="job-metadata-label">Experience</p>
-                <p className="job-metadata-value">{job.minExperience} {job.minExperience === 1 ? 'year' : 'years'}</p>
+                <p className="job-metadata-value">
+                  {normalizedExperience} {parseInt(normalizedExperience) === 1 ? 'year' : 'years'}
+                </p>
               </div>
             </div>
           </div>
@@ -195,26 +284,26 @@ const JobDetail = ({ job, onApply, loading }) => {
         <div className="job-detail-section">
           <h2 className="job-detail-section-title">Job Description</h2>
           <div className="job-detail-description">
-            {job.description}
+            {description}
           </div>
         </div>
         
-        {job.responsibilities && job.responsibilities.length > 0 && (
+        {responsibilitiesArray.length > 0 && (
           <div className="job-detail-section">
             <h2 className="job-detail-section-title">Responsibilities</h2>
             <ul className="job-detail-list">
-              {job.responsibilities.map((responsibility, index) => (
+              {responsibilitiesArray.map((responsibility, index) => (
                 <li key={index} className="job-detail-list-item">{responsibility}</li>
               ))}
             </ul>
           </div>
         )}
         
-        {job.requirements && job.requirements.length > 0 && (
+        {requirementsArray.length > 0 && (
           <div className="job-detail-section">
             <h2 className="job-detail-section-title">Requirements</h2>
             <ul className="job-detail-list">
-              {job.requirements.map((requirement, index) => (
+              {requirementsArray.map((requirement, index) => (
                 <li key={index} className="job-detail-list-item">{requirement}</li>
               ))}
             </ul>
@@ -225,7 +314,7 @@ const JobDetail = ({ job, onApply, loading }) => {
           <h2 className="job-detail-section-title">Contact Information</h2>
           <div className="job-detail-contact">
             <Mail className="job-contact-icon" />
-            <span className="job-contact-value">{job.contactEmail}</span>
+            <span className="job-contact-value">{normalizedContactEmail}</span>
           </div>
         </div>
         
@@ -237,6 +326,17 @@ const JobDetail = ({ job, onApply, loading }) => {
           >
             {loading ? 'Submitting...' : 'Apply Now'}
           </button>
+          
+          {/* Add Edit button for HR/Admin users only */}
+          {user && (user.accountType === 'hr' || user.accountType === 'admin') && (
+            <Link
+              to={`/edit-job/${job.id || job._id}`}
+              className="job-edit-button"
+            >
+              <Edit size={16} />
+              Edit Job
+            </Link>
+          )}
           
           <Link
             to="/jobs"

@@ -2,12 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { Users, Shield, CheckCircle, XCircle, AlertTriangle, Eye } from 'lucide-react';
 import api from '../../services/api';
 
+// Mock data for demonstration and testing - moved outside the component to be reusable
+const MOCK_APPROVALS = [
+  {
+    id: '101',
+    firstName: 'Emily',
+    lastName: 'Rogers',
+    email: 'emily@company.com',
+    workingId: 'HR-2025-01',
+    companyName: 'Tech Solutions Inc.',
+    phoneNumber: '555-123-4567',
+    createdAt: '2025-02-16T00:00:00.000Z'
+  },
+  {
+    id: '102',
+    firstName: 'Daniel',
+    lastName: 'Wilson',
+    email: 'daniel@company.com',
+    workingId: 'HR-2025-02',
+    companyName: 'Global Innovations Ltd.',
+    phoneNumber: '555-987-6543',
+    createdAt: '2025-02-15T00:00:00.000Z'
+  },
+  {
+    id: '103',
+    firstName: 'Jessica',
+    lastName: 'Brown',
+    email: 'jessica@company.com',
+    workingId: 'HR-2025-03',
+    companyName: 'Creative Minds Corp.',
+    phoneNumber: '555-567-8901',
+    createdAt: '2025-02-14T00:00:00.000Z'
+  }
+];
+
 const HRApprovals = () => {
   const [pendingApprovals, setPendingApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedApproval, setSelectedApproval] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     fetchPendingApprovals();
@@ -16,64 +51,95 @@ const HRApprovals = () => {
   const fetchPendingApprovals = async () => {
     try {
       setLoading(true);
-      // In a real application, you would call the API endpoint
-      // const response = await api.get('/admin/hr/pending-approvals');
-      // setPendingApprovals(response.data);
+      setError(null);
       
-      // Mock data for demonstration
-      setTimeout(() => {
-        const mockApprovals = [
-          {
-            id: '101',
-            name: 'Emily Rogers',
-            email: 'emily@company.com',
-            workingId: 'HR-2025-01',
-            company: 'Tech Solutions Inc.',
-            phoneNumber: '555-123-4567',
-            requestDate: '2025-02-16T00:00:00.000Z'
-          },
-          {
-            id: '102',
-            name: 'Daniel Wilson',
-            email: 'daniel@company.com',
-            workingId: 'HR-2025-02',
-            company: 'Global Innovations Ltd.',
-            phoneNumber: '555-987-6543',
-            requestDate: '2025-02-15T00:00:00.000Z'
-          },
-          {
-            id: '103',
-            name: 'Jessica Brown',
-            email: 'jessica@company.com',
-            workingId: 'HR-2025-03',
-            company: 'Creative Minds Corp.',
-            phoneNumber: '555-567-8901',
-            requestDate: '2025-02-14T00:00:00.000Z'
+      try {
+        // Attempt to fetch actual pending HR approvals from the API
+        // Make sure the path matches your server route exactly
+        const response = await api.get('admin/hr-approvals', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
-        ];
+        });
         
-        setPendingApprovals(mockApprovals);
-        setLoading(false);
-      }, 1000);
+        // If we get here, we've successfully fetched real data
+        console.log('API call successful:', response.data);
+        
+        // Use real data if available, otherwise use mock data
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          // Create a combined list, prioritizing real data
+          // Use a Map with ID as key to avoid duplicates in case a mock ID matches a real one
+          const approvalMap = new Map();
+          
+          // Add real approvals to the map
+          response.data.forEach(approval => {
+            approvalMap.set(approval.id, approval);
+          });
+          
+          // Add mock approvals if they don't conflict with real ones
+          MOCK_APPROVALS.forEach(mockApproval => {
+            // Only add mock if there's no real approval with the same ID
+            if (!approvalMap.has(mockApproval.id)) {
+              approvalMap.set(mockApproval.id, {
+                ...mockApproval,
+                isMock: true // Add a flag to identify mock data
+              });
+            }
+          });
+          
+          // Convert map back to array
+          const combinedApprovals = Array.from(approvalMap.values());
+          setPendingApprovals(combinedApprovals);
+        } else {
+          // If the response has no data, use mock data
+          setPendingApprovals(MOCK_APPROVALS.map(approval => ({...approval, isMock: true})));
+        }
+      } catch (apiErr) {
+        console.warn('Could not fetch real approvals, using mock data only:', apiErr);
+        setPendingApprovals(MOCK_APPROVALS.map(approval => ({...approval, isMock: true})));
+      }
+      
+      setLoading(false);
     } catch (err) {
-      console.error('Error fetching pending HR approvals:', err);
+      console.error('Error in fetchPendingApprovals:', err);
       setError('Failed to load pending HR approval requests. Please try again.');
       setLoading(false);
+      // Still set mock data so the UI isn't empty
+      setPendingApprovals(MOCK_APPROVALS.map(approval => ({...approval, isMock: true})));
     }
   };
 
   const handleApproval = async (id, approved) => {
     try {
-      // In a real application, you would call the API endpoint
-      // await api.put(`/admin/hr/${id}/approve`, { approved });
+      setProcessing(true);
+      const approvalToHandle = pendingApprovals.find(a => a.id === id);
       
-      // Update local state
+      if (approvalToHandle?.isMock) {
+        // For mock data, just update the local state without an API call
+        console.log(`Mock approval: ${approved ? 'Approving' : 'Rejecting'} HR staff with ID: ${id}`);
+        
+        // Add a small delay to simulate API call
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } else {
+        // For real data, make the API call
+        // Make sure the path matches your server route exactly
+        console.log(`Making API call to approve/reject HR staff with ID: ${id}`);
+        await api.put(`admin/hr-approvals/${id}`, { approved }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+      }
+      
+      // Update local state for both real and mock data
       setPendingApprovals(pendingApprovals.filter(approval => approval.id !== id));
       setShowModal(false);
       setSelectedApproval(null);
+      setProcessing(false);
     } catch (err) {
       console.error(`Error ${approved ? 'approving' : 'rejecting'} HR staff:`, err);
       setError(`Failed to ${approved ? 'approve' : 'reject'} HR staff. Please try again.`);
+      setProcessing(false);
     }
   };
 
@@ -102,6 +168,14 @@ const HRApprovals = () => {
     <div className="page-container">
       <div className="page-header-with-actions">
         <h1 className="page-title">HR Staff Approval Requests</h1>
+        <button 
+          onClick={fetchPendingApprovals}
+          className="refresh-button"
+          disabled={loading}
+          title="Refresh approval requests"
+        >
+          Refresh
+        </button>
       </div>
       
       {error && (
@@ -149,12 +223,27 @@ const HRApprovals = () => {
                   <td className="user-cell">
                     <div className="user-info">
                       <div className="user-avatar">
-                        {approval.name.split(' ').map(n => n[0]).join('')}
+                        {approval.firstName.charAt(0)}{approval.lastName.charAt(0)}
                       </div>
                       <div>
-                        <div className="user-name">{approval.name}</div>
+                        <div className="user-name">
+                          {approval.firstName} {approval.lastName}
+                          {approval.isMock && (
+                            <span style={{ 
+                              fontSize: '0.7rem', 
+                              backgroundColor: '#e5e7eb', 
+                              color: '#4b5563', 
+                              padding: '0.1rem 0.4rem', 
+                              borderRadius: '0.25rem', 
+                              marginLeft: '0.5rem',
+                              verticalAlign: 'middle'
+                            }}>
+                              MOCK
+                            </span>
+                          )}
+                        </div>
                         <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                          {approval.company}
+                          {approval.companyName || 'Not specified'}
                         </div>
                       </div>
                     </div>
@@ -165,7 +254,7 @@ const HRApprovals = () => {
                       {approval.workingId}
                     </span>
                   </td>
-                  <td>{formatDate(approval.requestDate)}</td>
+                  <td>{formatDate(approval.createdAt)}</td>
                   <td>
                     <div className="table-actions">
                       <button 
@@ -179,6 +268,7 @@ const HRApprovals = () => {
                         onClick={() => handleApproval(approval.id, true)}
                         className="action-button action-activate"
                         title="Approve"
+                        disabled={processing}
                       >
                         <CheckCircle size={16} />
                       </button>
@@ -186,6 +276,7 @@ const HRApprovals = () => {
                         onClick={() => handleApproval(approval.id, false)}
                         className="action-button action-deactivate"
                         title="Reject"
+                        disabled={processing}
                       >
                         <XCircle size={16} />
                       </button>
@@ -258,11 +349,11 @@ const HRApprovals = () => {
               <div style={{ marginBottom: '1.5rem' }}>
                 <div className="user-info" style={{ marginBottom: '1.5rem' }}>
                   <div className="user-avatar" style={{ width: '3rem', height: '3rem', fontSize: '1.25rem' }}>
-                    {selectedApproval.name.split(' ').map(n => n[0]).join('')}
+                    {selectedApproval.firstName.charAt(0)}{selectedApproval.lastName.charAt(0)}
                   </div>
                   <div>
-                    <div className="user-name" style={{ fontSize: '1.25rem' }}>{selectedApproval.name}</div>
-                    <div style={{ color: '#6b7280', marginTop: '0.25rem' }}>{selectedApproval.company}</div>
+                    <div className="user-name" style={{ fontSize: '1.25rem' }}>{selectedApproval.firstName} {selectedApproval.lastName}</div>
+                    <div style={{ color: '#6b7280', marginTop: '0.25rem' }}>{selectedApproval.companyName || 'Company not specified'}</div>
                   </div>
                 </div>
                 
@@ -285,11 +376,11 @@ const HRApprovals = () => {
                   </div>
                   <div>
                     <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Phone Number</div>
-                    <div style={{ fontWeight: '500' }}>{selectedApproval.phoneNumber}</div>
+                    <div style={{ fontWeight: '500' }}>{selectedApproval.phoneNumber || 'Not provided'}</div>
                   </div>
                   <div>
                     <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>Request Date</div>
-                    <div style={{ fontWeight: '500' }}>{formatDate(selectedApproval.requestDate)}</div>
+                    <div style={{ fontWeight: '500' }}>{formatDate(selectedApproval.createdAt)}</div>
                   </div>
                 </div>
               </div>
@@ -331,16 +422,18 @@ const HRApprovals = () => {
               <button 
                 onClick={() => handleApproval(selectedApproval.id, false)}
                 className="button-secondary"
+                disabled={processing}
               >
                 <XCircle size={16} />
-                Reject Request
+                {processing ? 'Processing...' : 'Reject Request'}
               </button>
               <button 
                 onClick={() => handleApproval(selectedApproval.id, true)}
                 className="button-primary"
+                disabled={processing}
               >
                 <CheckCircle size={16} />
-                Approve Request
+                {processing ? 'Processing...' : 'Approve Request'}
               </button>
             </div>
           </div>

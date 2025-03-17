@@ -10,8 +10,9 @@ import MainLayout from './components/layouts/MainLayout';
 // Auth pages
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
-import ForgotPassword from './pages/auth/ForgotPassword';
-import ResetPassword from './pages/auth/ResetPassword';
+// Import components directly if they exist, or leave commented out if they don't
+// import ForgotPassword from './pages/auth/ForgotPassword';
+// import ResetPassword from './pages/auth/ResetPassword';
 
 // Public pages
 import Home from './pages/Home';
@@ -19,7 +20,7 @@ import JobListings from './pages/jobs/JobListings';
 import JobDetailsPage from './pages/jobs/JobDetailsPage';
 import About from './pages/About';
 import Contact from './pages/Contact';
-import FAQ from './pages/FAQ';
+// import FAQ from './pages/FAQ';
 
 // Applicant pages
 import ApplicantDashboard from './pages/applicant/Dashboard';
@@ -46,29 +47,22 @@ import QualificationReport from './pages/admin/QualificationReport';
 
 // Profile pages
 import ProfilePage from './pages/Profile';
+import EducationForm from './pages/profile/EducationForm';
+import ExperienceForm from './pages/profile/ExperienceForm';
+import PreferencesForm from './pages/profile/PreferencesForm';
 
 // Helpers
 import PrivateRoute from './components/auth/PrivateRoute';
 import RoleRoute from './components/auth/RoleRoute';
 import NotFound from './pages/NotFound';
 
-// Create default placeholder components for any missing components
+// Create default placeholder component
 const DefaultComponent = ({ name }) => <div>Component {name} not implemented yet</div>;
 
-// Create placeholders for any missing components
-const createPlaceholder = (name) => () => <DefaultComponent name={name} />;
-
-// Use placeholders for potentially missing components
-const JobCategoriesComponent = JobCategories || createPlaceholder('JobCategories');
-const HRApprovalsComponent = HRApprovals || createPlaceholder('HRApprovals');
-const ReportsComponent = Reports || createPlaceholder('Reports');
-const CategoryReportComponent = CategoryReport || createPlaceholder('CategoryReport');
-const QualificationReportComponent = QualificationReport || createPlaceholder('QualificationReport');
-const ForgotPasswordComponent = ForgotPassword || createPlaceholder('ForgotPassword');
-const ResetPasswordComponent = ResetPassword || createPlaceholder('ResetPassword');
-const AboutComponent = About || createPlaceholder('About');
-const ContactComponent = Contact || createPlaceholder('Contact');
-const FAQComponent = FAQ || createPlaceholder('FAQ');
+// Create placeholder component functions directly
+const ForgotPasswordComponent = () => <DefaultComponent name="ForgotPassword" />;
+const ResetPasswordComponent = () => <DefaultComponent name="ResetPassword" />;
+const FAQComponent = () => <DefaultComponent name="FAQ" />;
 
 function App() {
   return (
@@ -84,8 +78,8 @@ function App() {
             <Route path="/reset-password/:token" element={<ResetPasswordComponent />} />
             <Route path="/jobs" element={<JobListings />} />
             <Route path="/jobs/:id" element={<JobDetailsPage />} />
-            <Route path="/about" element={<AboutComponent />} />
-            <Route path="/contact" element={<ContactComponent />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQComponent />} />
             
             {/* Applicant Routes */}
@@ -135,8 +129,10 @@ function App() {
               path="/job-postings" 
               element={
                 <PrivateRoute>
-                  <RoleRoute allowedRoles={['hr']}>
-                    <JobPostings />
+                  <RoleRoute allowedRoles={['hr', 'admin']}>
+                    <MainLayout>
+                      <JobPostings />
+                    </MainLayout>
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -218,7 +214,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleRoute allowedRoles={['admin']}>
-                    <JobCategoriesComponent />
+                    <JobCategories />
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -228,7 +224,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleRoute allowedRoles={['admin']}>
-                    <HRApprovalsComponent />
+                    <HRApprovals />
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -238,7 +234,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleRoute allowedRoles={['admin']}>
-                    <ReportsComponent />
+                    <Reports />
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -248,7 +244,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleRoute allowedRoles={['admin']}>
-                    <CategoryReportComponent />
+                    <CategoryReport />
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -258,7 +254,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleRoute allowedRoles={['admin']}>
-                    <QualificationReportComponent />
+                    <QualificationReport />
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -270,6 +266,54 @@ function App() {
               element={
                 <PrivateRoute>
                   <ProfilePage />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/education/add" 
+              element={
+                <PrivateRoute>
+                  <EducationForm />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/education/edit/:id" 
+              element={
+                <PrivateRoute>
+                  <EducationForm />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/experience/add" 
+              element={
+                <PrivateRoute>
+                  <ExperienceForm />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/experience/edit/:id" 
+              element={
+                <PrivateRoute>
+                  <ExperienceForm />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/preferences/add" 
+              element={
+                <PrivateRoute>
+                  <PreferencesForm />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/preferences/edit/:id" 
+              element={
+                <PrivateRoute>
+                  <PreferencesForm />
                 </PrivateRoute>
               } 
             />

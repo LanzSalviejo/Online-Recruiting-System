@@ -14,45 +14,24 @@ const JobDetailsPage = () => {
     const fetchJob = async () => {
       try {
         setLoading(true);
-        // In a real application, you would fetch from your API
-        // const response = await api.get(`/jobs/${id}`);
-        // setJob(response.data);
+        const response = await api.get(`/jobs/${id}`);
         
-        // Mock data for demonstration
-        setTimeout(() => {
-          setJob({
-            _id: id,
-            title: 'Senior Frontend Developer',
-            companyName: 'Tech Innovations Inc.',
-            location: 'Vancouver, BC',
-            positionType: 'Full Time',
-            categoryName: 'Information Technology',
-            salary: 110000,
-            description: 'We are seeking an experienced Frontend Developer to join our team. You will be responsible for building user interfaces using React.js and modern web technologies.\n\nYou will work closely with designers, backend developers, and product managers to create engaging and responsive web applications.',
-            postDate: new Date('2025-02-01'),
-            dueDate: new Date('2025-03-15'),
-            contactEmail: 'careers@techinnovations.com',
-            minEducationLevel: 'Bachelor\'s Degree',
-            minExperience: 4,
-            responsibilities: [
-              'Develop and maintain responsive web applications using React and modern JavaScript',
-              'Collaborate with UX/UI designers to implement intuitive user interfaces',
-              'Optimize applications for maximum speed and scalability',
-              'Ensure cross-browser compatibility and responsive design',
-              'Write clean, maintainable, and well-documented code'
-            ],
-            requirements: [
-              'Bachelor\'s degree in Computer Science or related field',
-              'At least 4 years of experience in frontend development',
-              'Proficiency in JavaScript, React.js, HTML5, and CSS3',
-              'Experience with state management libraries (Redux, MobX, etc.)',
-              'Understanding of responsive design principles',
-              'Knowledge of modern frontend build tools and workflows',
-              'Excellent problem-solving and communication skills'
-            ]
-          });
-          setLoading(false);
-        }, 1000);
+        // Format dates properly and ensure all required fields exist
+        const jobData = {
+          ...response.data,
+          // Ensure dates are properly formatted
+          postDate: response.data.post_date || response.data.postDate,
+          dueDate: response.data.due_date || response.data.dueDate,
+          // Ensure company name is properly extracted
+          companyName: response.data.company_name || response.data.companyName || "Unknown Company",
+          // Ensure education and experience fields exist
+          minEducationLevel: response.data.min_education_level || response.data.minEducationLevel || "Not specified",
+          minExperience: response.data.min_experience || response.data.minExperience || 0
+        };
+        
+        console.log("Job data retrieved:", jobData);
+        setJob(jobData);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching job details:', error);
         setError('Failed to load job details. Please try again later.');
@@ -63,20 +42,30 @@ const JobDetailsPage = () => {
     fetchJob();
   }, [id]);
 
-  const handleApply = async (jobId) => {
+  const handleApply = async () => {
+    if (!job || !job.id) {
+      alert('Invalid job ID. Cannot submit application.');
+      return;
+    }
+  
     try {
       setApplyLoading(true);
-      // In a real application, you would submit to your API
-      // await api.post('/applications', { jobId });
+      const actualJobId = job.id || job._id;
       
-      // Mock submission for demonstration
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('Submitting application for job ID:', actualJobId);
+      
+      await api.post(`/jobs/apply/${actualJobId}`, {
+        // You can add cover letter or resume path here if needed
+        coverLetter: '',
+        resumePath: ''
+      });
       
       alert('Application submitted successfully!');
       setApplyLoading(false);
     } catch (error) {
       console.error('Error submitting application:', error);
-      alert('Failed to submit application. Please try again.');
+      const errorMessage = error.response?.data?.message || 'Failed to submit application. Please try again.';
+      alert(errorMessage);
       setApplyLoading(false);
     }
   };

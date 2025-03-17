@@ -25,4 +25,5 @@ yarn-error.log*
 .env.production
 */server/.env
 
-node_modules
+**/node_modules/
+build/static

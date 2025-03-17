@@ -18,10 +18,37 @@ const MonthlyReportChart = ({ data, year, month }) => {
     applications: category.totalApplications,
   }));
 
+  // Function to get month name from number
+  const getMonthName = (monthNum) => {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    // If month is a string that starts with a number (like "03"), parse it
+    if (typeof monthNum === 'string' && monthNum.match(/^\d+/)) {
+      const parsed = parseInt(monthNum, 10);
+      if (!isNaN(parsed) && parsed >= 1 && parsed <= 12) {
+        return months[parsed - 1];
+      }
+    }
+    
+    // If month is already a number between 1-12
+    if (typeof monthNum === 'number' && monthNum >= 1 && monthNum <= 12) {
+      return months[monthNum - 1];
+    }
+    
+    // If it's already a month name or invalid, return as is
+    return monthNum;
+  };
+
+  // Format the title with the full month name
+  const formattedMonth = month ? getMonthName(month) : null;
+  
   return (
     <div className="report-chart-container">
       <h3 className="chart-title">
-        {month ? `${month} ${year}` : `${year}`} Job Category Report
+        {formattedMonth ? `${formattedMonth} ${year}` : `${year}`} Job Category Report
       </h3>
       <div className="chart-content">
         <ResponsiveContainer width="100%" height={400}>

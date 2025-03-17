@@ -11,7 +11,9 @@ import {
   ChevronDown, 
   Search,
   Users,
-  AlertTriangle
+  AlertTriangle,
+  User,
+  CheckCircle
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -24,16 +26,33 @@ const JobPostings = () => {
   const [filter, setFilter] = useState('active'); // 'active', 'all', 'expired'
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'alphabetical', 'applications'
   const [showSortOptions, setShowSortOptions] = useState(false);
+  const isAdmin = user?.accountType === 'admin';
+  
+  // New state for delete modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [jobToDelete, setJobToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     const fetchJobPostings = async () => {
       try {
         setLoading(true);
         
-        // Fetch all job postings created by this HR user
-        const response = await api.get('/hr/job-postings');
-        setJobPostings(response.data);
+        // Different endpoint for admin vs HR
+        const endpoint = isAdmin 
+          ? '/admin/jobs' // Admin endpoint for all jobs
+          : '/hr/job-postings'; // HR sees only their jobs
+          
+        const response = await api.get(endpoint);
         
+        // For admin endpoint, extract jobs from the response structure
+        const jobs = isAdmin && response.data.jobs 
+          ? response.data.jobs 
+          : response.data;
+          
+        setJobPostings(jobs);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching job postings:', err);
@@ -43,7 +62,7 @@ const JobPostings = () => {
     };
 
     fetchJobPostings();
-  }, []);
+  }, [isAdmin]);
 
   // Filter job postings based on filter state
   const getFilteredJobs = () => {
@@ -69,7 +88,8 @@ const JobPostings = () => {
         job.title.toLowerCase().includes(term) ||
         job.companyName.toLowerCase().includes(term) ||
         job.location.toLowerCase().includes(term) ||
-        job.categoryName.toLowerCase().includes(term)
+        (job.categoryName && job.categoryName.toLowerCase().includes(term)) ||
+        (isAdmin && job.creatorName && job.creatorName.toLowerCase().includes(term))
       );
     }
 
@@ -85,17 +105,41 @@ const JobPostings = () => {
     return filtered;
   };
 
-  const handleDeleteJob = async (jobId) => {
-    if (window.confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) {
-      try {
-        await api.delete(`/jobs/${jobId}`);
+  // Updated delete job function
+  const handleDeleteJob = (job) => {
+    setJobToDelete(job);
+    setShowDeleteModal(true);
+  };
+
+  // Confirm delete function
+  const confirmDelete = async () => {
+    if (!jobToDelete) return;
+    
+    try {
+      setIsDeleting(true);
+      
+      // Different endpoint depending on user type
+      const endpoint = isAdmin
+        ? `/admin/jobs/${jobToDelete._id}`  // Admin endpoint
+        : `/jobs/${jobToDelete._id}`;       // Regular endpoint
         
-        // Update local state to remove the deleted job
-        setJobPostings(jobPostings.filter(job => job._id !== jobId));
-      } catch (err) {
-        console.error('Error deleting job posting:', err);
-        alert('Failed to delete job posting. Please try again.');
-      }
+      await api.delete(endpoint);
+      
+      // Update local state to remove the deleted job
+      setJobPostings(prevJobs => prevJobs.filter(job => job._id !== jobToDelete._id));
+      
+      // Show success message
+      setSuccessMessage("Job posting deleted successfully");
+      setTimeout(() => setSuccessMessage(null), 3000);
+      
+      // Reset modal state
+      setShowDeleteModal(false);
+      setJobToDelete(null);
+      setIsDeleting(false);
+    } catch (err) {
+      console.error('Error deleting job posting:', err);
+      setDeleteError("Failed to delete job posting. Please try again.");
+      setIsDeleting(false);
     }
   };
 
@@ -141,6 +185,28 @@ const JobPostings = () => {
     }
   };
 
+  // For admin users, render the creator info
+  const renderCreatorInfo = (job) => {
+    if (isAdmin && job.creatorName) {
+      return (
+        <div className="job-posting-meta-item job-creator-info">
+          <User size={16} className="job-posting-meta-icon" />
+          <span>{job.creatorName}</span>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Check if user can edit/delete this job
+  const canModifyJob = (job) => {
+    // Admins can modify any job
+    if (isAdmin) return true;
+    
+    // HR users can only modify their own jobs
+    return job.creatorId === user.id;
+  };
+
   const filteredJobs = getFilteredJobs();
 
   if (loading) {
@@ -166,14 +232,19 @@ const JobPostings = () => {
   return (
     <div className="page-container">
       <div className="page-header-with-actions">
-        <h1 className="page-title">Manage Job Postings</h1>
-        <Link 
-          to="/post-job" 
-          className="primary-button"
-        >
-          <Plus size={16} />
-          Post New Job
-        </Link>
+        <h1 className="page-title">
+          {isAdmin ? 'All Job Postings' : 'Manage Job Postings'}
+        </h1>
+        {/* Only show Post New Job button for HR users */}
+        {!isAdmin && (
+          <Link 
+            to="/post-job" 
+            className="primary-button"
+          >
+            <Plus size={16} />
+            Post New Job
+          </Link>
+        )}
       </div>
       
       {/* Filter and Search */}
@@ -207,7 +278,7 @@ const JobPostings = () => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search job title, company..."
+                placeholder={isAdmin ? "Search job title, company, creator..." : "Search job title, company..."}
                 className="search-input"
               />
             </div>
@@ -266,10 +337,12 @@ const JobPostings = () => {
           <h3 className="no-jobs-title">No job postings found</h3>
           <p className="no-jobs-message">
             {filter !== 'all' 
-              ? `You don't have any ${filter === 'active' ? 'active' : 'expired'} job postings.` 
+              ? `No ${filter === 'active' ? 'active' : 'expired'} job postings found.` 
               : searchTerm
                 ? `No job postings match your search.`
-                : `You haven't created any job postings yet.`}
+                : isAdmin 
+                  ? `There are no job postings in the system yet.`
+                  : `You haven't created any job postings yet.`}
           </p>
           {filter !== 'all' ? (
             <button 
@@ -278,12 +351,12 @@ const JobPostings = () => {
             >
               View all job postings
             </button>
-          ) : (
+          ) : (!isAdmin && (
             <Link to="/post-job" className="primary-button">
               <Plus size={16} />
               Post New Job
             </Link>
-          )}
+          ))}
         </div>
       ) : (
         <div className="job-postings-list">
@@ -314,6 +387,7 @@ const JobPostings = () => {
                       ? `Expired on ${formatDate(job.dueDate)}` 
                       : `Closes on ${formatDate(job.dueDate)}`}
                   </div>
+                  {renderCreatorInfo(job)}
                 </div>
                 
                 <div className="job-posting-dates">
@@ -333,7 +407,7 @@ const JobPostings = () => {
               
               <div className="job-posting-right">
                 <div className="applications-badge">
-                  <Users size={16} className="applications-badge-icon" />
+                <Users size={16} className="applications-badge-icon" />
                   <span className="applications-count">{job.applicationsCount || 0}</span>
                   <span className="applications-label">Applications</span>
                 </div>
@@ -347,6 +421,8 @@ const JobPostings = () => {
                     <Users size={16} />
                     <span className="action-label">Review</span>
                   </Link>
+
+                  {/* Edit button - shown for all jobs */}
                   <Link 
                     to={`/edit-job/${job._id}`} 
                     className="job-posting-action-button job-posting-action-edit"
@@ -355,8 +431,10 @@ const JobPostings = () => {
                     <Edit size={16} />
                     <span className="action-label">Edit</span>
                   </Link>
+                  
+                  {/* Delete button */}
                   <button 
-                    onClick={() => handleDeleteJob(job._id)} 
+                    onClick={() => handleDeleteJob(job)} 
                     className="job-posting-action-button job-posting-action-delete"
                     title="Delete Job Posting"
                   >
@@ -367,6 +445,63 @@ const JobPostings = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && jobToDelete && (
+        <div className="delete-modal-overlay">
+          <div className="delete-modal">
+            <div className="delete-modal-header">
+              <AlertTriangle size={24} className="delete-modal-icon" />
+              <h3 className="delete-modal-title">Delete Job Posting</h3>
+            </div>
+            
+            <div className="delete-modal-content">
+              <p>Are you sure you want to delete the following job posting?</p>
+              <div className="delete-job-details">
+                <strong>{jobToDelete.title}</strong>
+                <span>{jobToDelete.companyName || jobToDelete.company_name}</span>
+              </div>
+              <p className="delete-warning">This action cannot be undone.</p>
+              
+              {deleteError && (
+                <div className="delete-error-message">
+                  <AlertTriangle size={16} />
+                  <span>{deleteError}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="delete-modal-actions">
+              <button 
+                className="delete-modal-cancel" 
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setJobToDelete(null);
+                  setDeleteError(null);
+                }}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button 
+                className="delete-modal-confirm" 
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Job'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="success-message">
+          <CheckCircle size={16} />
+          <span>{successMessage}</span>
         </div>
       )}
     </div>
