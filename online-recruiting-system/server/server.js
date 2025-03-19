@@ -17,7 +17,9 @@ app.use('/api/profile', require('./routes/profileRoutes'));
 app.use('/api/screening', require('./routes/screening'));
 app.use('/api/matching', require('./routes/matching'));
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/admin/hr-approvals', require('./routes/hrApprovals'));
 app.use('/api', require('./routes/home'));
+
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   // Set static folder

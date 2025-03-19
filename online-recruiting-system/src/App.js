@@ -10,16 +10,17 @@ import MainLayout from './components/layouts/MainLayout';
 // Auth pages
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
-import ForgotPassword from './pages/auth/ForgotPassword';
-import ResetPassword from './pages/auth/ResetPassword';
+// Import components directly if they exist, or leave commented out if they don't
+// import ForgotPassword from './pages/auth/ForgotPassword';
+// import ResetPassword from './pages/auth/ResetPassword';
 
 // Public pages
 import Home from './pages/Home';
 import JobListings from './pages/jobs/JobListings';
 import JobDetailsPage from './pages/jobs/JobDetailsPage';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import FAQ from './pages/FAQ';
+// import About from './pages/About';
+// import Contact from './pages/Contact';
+// import FAQ from './pages/FAQ';
 
 // Applicant pages
 import ApplicantDashboard from './pages/applicant/Dashboard';
@@ -52,23 +53,15 @@ import PrivateRoute from './components/auth/PrivateRoute';
 import RoleRoute from './components/auth/RoleRoute';
 import NotFound from './pages/NotFound';
 
-// Create default placeholder components for any missing components
+// Create default placeholder component
 const DefaultComponent = ({ name }) => <div>Component {name} not implemented yet</div>;
 
-// Create placeholders for any missing components
-const createPlaceholder = (name) => () => <DefaultComponent name={name} />;
-
-// Use placeholders for potentially missing components
-const JobCategoriesComponent = JobCategories || createPlaceholder('JobCategories');
-const HRApprovalsComponent = HRApprovals || createPlaceholder('HRApprovals');
-const ReportsComponent = Reports || createPlaceholder('Reports');
-const CategoryReportComponent = CategoryReport || createPlaceholder('CategoryReport');
-const QualificationReportComponent = QualificationReport || createPlaceholder('QualificationReport');
-const ForgotPasswordComponent = ForgotPassword || createPlaceholder('ForgotPassword');
-const ResetPasswordComponent = ResetPassword || createPlaceholder('ResetPassword');
-const AboutComponent = About || createPlaceholder('About');
-const ContactComponent = Contact || createPlaceholder('Contact');
-const FAQComponent = FAQ || createPlaceholder('FAQ');
+// Create placeholder component functions directly
+const ForgotPasswordComponent = () => <DefaultComponent name="ForgotPassword" />;
+const ResetPasswordComponent = () => <DefaultComponent name="ResetPassword" />;
+const AboutComponent = () => <DefaultComponent name="About" />;
+const ContactComponent = () => <DefaultComponent name="Contact" />;
+const FAQComponent = () => <DefaultComponent name="FAQ" />;
 
 function App() {
   return (
@@ -218,7 +211,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleRoute allowedRoles={['admin']}>
-                    <JobCategoriesComponent />
+                    <JobCategories />
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -228,7 +221,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleRoute allowedRoles={['admin']}>
-                    <HRApprovalsComponent />
+                    <HRApprovals />
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -238,7 +231,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleRoute allowedRoles={['admin']}>
-                    <ReportsComponent />
+                    <Reports />
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -248,7 +241,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleRoute allowedRoles={['admin']}>
-                    <CategoryReportComponent />
+                    <CategoryReport />
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -258,7 +251,7 @@ function App() {
               element={
                 <PrivateRoute>
                   <RoleRoute allowedRoles={['admin']}>
-                    <QualificationReportComponent />
+                    <QualificationReport />
                   </RoleRoute>
                 </PrivateRoute>
               } 

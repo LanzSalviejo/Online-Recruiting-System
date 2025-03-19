@@ -116,6 +116,10 @@ REACT_APP_API_URL=http://localhost:5000/api
 
 ```bash
 npm start
+
+cd server
+
+node server.js
 ```
 
 The application should now be running at http://localhost:3000.
