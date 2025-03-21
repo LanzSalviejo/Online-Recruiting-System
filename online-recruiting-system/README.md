@@ -59,9 +59,6 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=online_recruiting_system
 
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_key_should_be_long_and_complex
-
 # Frontend URL (for email links)
 FRONTEND_URL=http://localhost:3000
 
