@@ -3,7 +3,7 @@ require('dotenv').config();
 
 module.exports = function(req, res, next) {
   // Get token from header
-  const token = req.header('x-auth-token');
+  const token = req.header('x-auth-token') || req.header('Authorization')?.replace('Bearer ', '');
 
   // Check if no token
   if (!token) {

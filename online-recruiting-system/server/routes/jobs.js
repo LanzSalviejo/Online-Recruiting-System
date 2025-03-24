@@ -300,6 +300,9 @@ router.post('/', [auth, roleCheck('hr'), [
       job.category_name = categoryResult.rows[0].name;
     }
     
+    // Emit event for new job posting - this will trigger the matching process
+    global.eventEmitter.emit('newJobPosted', job.id);
+    
     res.status(201).json(job);
   } catch (error) {
     console.error('Error creating job posting:', error);

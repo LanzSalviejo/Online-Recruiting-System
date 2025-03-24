@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./config/db');
 const path = require('path');
+require('./utils/eventEmitter');
+const jobMatchingScheduler = require('./services/jobMatchingScheduler');
+const autoScreeningService = require('./services/autoScreeningService');
 const app = express();
 
 // Init Middleware
@@ -17,6 +20,7 @@ app.use('/api/profile', require('./routes/profileRoutes'));
 app.use('/api/screening', require('./routes/screening'));
 app.use('/api/matching', require('./routes/matching'));
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/admin', require('./routes/admin'));
 app.use('/api/admin/hr-approvals', require('./routes/hrApprovals'));
 app.use('/api', require('./routes/home'));
 
@@ -31,4 +35,14 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+  
+  // Initialize job matching scheduler
+  jobMatchingScheduler.initialize();
+  console.log('Job matching scheduler initialized');
+  
+  // Initialize auto-screening service
+  autoScreeningService.initialize();
+  console.log('Auto-screening service initialized');
+});

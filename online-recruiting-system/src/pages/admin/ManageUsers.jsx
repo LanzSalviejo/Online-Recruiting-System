@@ -24,72 +24,122 @@ const ManageUsers = () => {
   const [showSortOptions, setShowSortOptions] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
+  // Mock user data that will be combined with API data
+  const MOCK_USERS = [
+    {
+      id: 'mock-1',
+      firstName: 'John',
+      lastName: 'Smith',
+      email: 'john@example.com',
+      accountType: 'applicant',
+      isActive: true,
+      isVerified: true,
+      createdAt: '2025-01-15T12:00:00.000Z',
+      isMock: true
+    },
+    {
+      id: 'mock-2',
+      firstName: 'Sarah',
+      lastName: 'Johnson',
+      email: 'sarah@example.com',
+      accountType: 'hr',
+      isActive: true,
+      isVerified: true,
+      createdAt: '2025-01-20T12:00:00.000Z',
+      isMock: true
+    },
+    {
+      id: 'mock-3',
+      firstName: 'Michael',
+      lastName: 'Brown',
+      email: 'michael@example.com',
+      accountType: 'admin',
+      isActive: true,
+      isVerified: true,
+      createdAt: '2024-12-05T12:00:00.000Z',
+      isMock: true
+    },
+    {
+      id: 'mock-4',
+      firstName: 'Emma',
+      lastName: 'Davis',
+      email: 'emma@example.com',
+      accountType: 'applicant',
+      isActive: false,
+      isVerified: true,
+      createdAt: '2024-12-20T12:00:00.000Z',
+      isMock: true
+    },
+    {
+      id: 'mock-5',
+      firstName: 'Robert',
+      lastName: 'Wilson',
+      email: 'robert@example.com',
+      accountType: 'hr',
+      isActive: true,
+      isVerified: false,
+      createdAt: '2025-02-01T12:00:00.000Z',
+      isMock: true
+    },
+    {
+      id: 'mock-6',
+      firstName: 'Jennifer',
+      lastName: 'Lee',
+      email: 'jennifer@example.com',
+      accountType: 'applicant',
+      isActive: true,
+      isVerified: true,
+      createdAt: '2025-02-05T12:00:00.000Z',
+      isMock: true
+    },
+    {
+      id: 'mock-7',
+      firstName: 'David',
+      lastName: 'Garcia',
+      email: 'david@example.com',
+      accountType: 'hr',
+      isActive: true,
+      isVerified: true,
+      createdAt: '2025-01-25T12:00:00.000Z',
+      isMock: true
+    }
+  ];
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
         
-        // In a real application, you would call your API with the appropriate parameters
-        // For this example, we'll simulate the API call with a mock response
+        // Build query parameters
+        const params = new URLSearchParams();
         
-        // Mock data for demonstration
-        setTimeout(() => {
-          const mockUsers = [
-            {
-              id: '1',
-              firstName: 'John',
-              lastName: 'Smith',
-              email: 'john@example.com',
-              accountType: 'applicant',
-              isActive: true,
-              isVerified: true,
-              createdAt: '2025-01-15T12:00:00.000Z'
-            },
-            {
-              id: '2',
-              firstName: 'Sarah',
-              lastName: 'Johnson',
-              email: 'sarah@example.com',
-              accountType: 'hr',
-              isActive: true,
-              isVerified: true,
-              createdAt: '2025-01-20T12:00:00.000Z'
-            },
-            {
-              id: '3',
-              firstName: 'Michael',
-              lastName: 'Brown',
-              email: 'michael@example.com',
-              accountType: 'admin',
-              isActive: true,
-              isVerified: true,
-              createdAt: '2024-12-05T12:00:00.000Z'
-            },
-            {
-              id: '4',
-              firstName: 'Emma',
-              lastName: 'Davis',
-              email: 'emma@example.com',
-              accountType: 'applicant',
-              isActive: false,
-              isVerified: true,
-              createdAt: '2024-12-20T12:00:00.000Z'
-            },
-            {
-              id: '5',
-              firstName: 'Robert',
-              lastName: 'Wilson',
-              email: 'robert@example.com',
-              accountType: 'hr',
-              isActive: true,
-              isVerified: false,
-              createdAt: '2025-02-01T12:00:00.000Z'
-            }
-          ];
-          
-          setUsers(mockUsers);
-          setLoading(false);
-        }, 1000);
+        if (filter !== 'all') {
+          // Convert plural form to singular (e.g. 'applicants' -> 'applicant')
+          const accountType = filter === 'applicants' 
+            ? 'applicant' 
+            : filter === 'hr' ? 'hr' : 'admin';
+          params.append('accountType', accountType);
+        }
+        
+        if (searchTerm) {
+          params.append('search', searchTerm);
+        }
+        
+        params.append('sort', sortBy);
+        
+        // Make API call with constructed parameters
+        const response = await api.get(`/admin/users?${params.toString()}`);
+        
+        console.log('API response data:', response.data);
+        
+        // Use the API data instead of mock data
+        if (response.data && response.data.users) {
+          setUsers(response.data.users);
+        } else {
+          setError('Unexpected API response format');
+        }
+        
+        setLoading(false);
       } catch (err) {
         console.error('Error fetching users:', err);
         setError('Failed to load users. Please try again later.');
@@ -98,7 +148,7 @@ const ManageUsers = () => {
     };
     
     fetchUsers();
-  }, []);
+  }, [filter, sortBy, searchTerm]);
 
   // Filter and sort users
   const getFilteredUsers = () => {
@@ -142,8 +192,8 @@ const ManageUsers = () => {
   // Handle user activation/deactivation
   const handleActivationToggle = async (userId, currentStatus) => {
     try {
-      // In a real application, you would call your API
-      // await api.put(`/admin/users/${userId}/toggle-activation`);
+      // Call the API to toggle activation
+      const response = await api.put(`/admin/users/${userId}/toggle-activation`);
       
       // Update the local state
       setUsers(prev => 
@@ -151,7 +201,7 @@ const ManageUsers = () => {
       );
     } catch (err) {
       console.error('Error toggling user activation:', err);
-      alert('Failed to update user status. Please try again.');
+      setError('Failed to update user status. Please try again.');
     }
   };
 

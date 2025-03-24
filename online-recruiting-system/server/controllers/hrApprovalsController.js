@@ -14,7 +14,7 @@ exports.getPendingApprovals = async (req, res) => {
     // Don't check is_rejected at all since the account you're looking for
     // has is_rejected = false
     const query = `
-      SELECT 
+    SELECT 
         u.id,
         u.first_name AS "firstName",
         u.last_name AS "lastName",
@@ -22,17 +22,15 @@ exports.getPendingApprovals = async (req, res) => {
         u.created_at AS "createdAt",
         hr.working_id AS "workingId",
         hr.phone_number AS "phoneNumber",
-        COALESCE(hr.company_name, c.name) AS "companyName"
-      FROM 
+        hr.company_name AS "companyName"
+    FROM 
         users u
-      JOIN 
+    JOIN 
         hr_staff hr ON u.id = hr.user_id
-      LEFT JOIN
-        companies c ON hr.company_id = c.id
-      WHERE 
+    WHERE 
         u.account_type = 'hr' 
         AND hr.is_approved = false
-      ORDER BY 
+    ORDER BY 
         u.created_at DESC
     `;
     
