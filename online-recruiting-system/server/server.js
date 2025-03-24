@@ -1,9 +1,12 @@
+// Update to server.js to initialize the auto-screening service
+
 const express = require('express');
 const cors = require('cors');
 const pool = require('./config/db');
 const path = require('path');
 require('./utils/eventEmitter'); // Initialize global event emitter
 const jobMatchingScheduler = require('./services/jobMatchingScheduler');
+const autoScreeningService = require('./services/autoScreeningService'); // Import auto-screening service
 const app = express();
 
 // Init Middleware
@@ -40,4 +43,8 @@ app.listen(PORT, () => {
   // Initialize job matching scheduler
   jobMatchingScheduler.initialize();
   console.log('Job matching scheduler initialized');
+  
+  // Initialize auto-screening service
+  autoScreeningService.initialize();
+  console.log('Auto-screening service initialized');
 });
