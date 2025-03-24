@@ -6576,44 +6576,75 @@
   gap: 0.5rem;
 }
 
-.action-button {
+/* Action Button Styles with Fallback Icons */
+.table-actions {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  background-color: transparent;
-  border: none;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  transition: all 0.2s;
+  gap: 0.5rem;
 }
 
-.action-edit {
-  color: #6b7280;
+.table-actions .action-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.375rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
-.action-edit:hover {
-  color: #4b5563;
-  background-color: #f3f4f6;
+/* Fallback icons using CSS */
+.table-actions .action-edit::before {
+  content: "📋" !important;
+  font-size: 14px !important;
 }
 
-.action-activate {
-  color: #16a34a;
+.table-actions .action-activate::before {
+  content: "✓" !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
 }
 
-.action-activate:hover {
-  color: #166534;
-  background-color: #dcfce7;
+.table-actions .action-deactivate::before {
+  content: "✕" !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
 }
 
-.action-deactivate {
-  color: #ef4444;
+.table-actions .action-edit {
+  color: #6b7280 !important;
+  background-color: #f9fafb !important;
 }
 
-.action-deactivate:hover {
-  color: #b91c1c;
-  background-color: #fee2e2;
+.table-actions .action-edit:hover {
+  color: #4b5563 !important;
+  background-color: #f3f4f6 !important;
+}
+
+.table-actions .action-activate {
+  color: #16a34a !important;
+  background-color: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+}
+
+.table-actions .action-activate:hover {
+  color: #166534 !important;
+  background-color: #dcfce7 !important;
+}
+
+.table-actions .action-deactivate {
+  color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+
+.table-actions .action-deactivate:hover {
+  color: #b91c1c !important;
+  background-color: #fee2e2 !important;
 }
 
 @keyframes spin {

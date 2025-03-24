@@ -56,7 +56,11 @@ const HRApprovals = () => {
       try {
         // Attempt to fetch actual pending HR approvals from the API
         // Make sure the path matches your server route exactly
-        const response = await api.get('/api/admin/hr-approvals');
+        const response = await api.get('admin/hr-approvals', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
         
         // If we get here, we've successfully fetched real data
         console.log('API call successful:', response.data);
@@ -120,7 +124,11 @@ const HRApprovals = () => {
         // For real data, make the API call
         // Make sure the path matches your server route exactly
         console.log(`Making API call to approve/reject HR staff with ID: ${id}`);
-        await api.put(`/api/admin/hr-approvals/${id}`, { approved });
+        await api.put(`admin/hr-approvals/${id}`, { approved }, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
       }
       
       // Update local state for both real and mock data
