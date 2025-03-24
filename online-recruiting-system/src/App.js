@@ -18,7 +18,7 @@ import Register from './pages/auth/Register';
 import Home from './pages/Home';
 import JobListings from './pages/jobs/JobListings';
 import JobDetailsPage from './pages/jobs/JobDetailsPage';
-// import About from './pages/About';
+import About from './pages/About';
 // import Contact from './pages/Contact';
 // import FAQ from './pages/FAQ';
 
@@ -59,7 +59,6 @@ const DefaultComponent = ({ name }) => <div>Component {name} not implemented yet
 // Create placeholder component functions directly
 const ForgotPasswordComponent = () => <DefaultComponent name="ForgotPassword" />;
 const ResetPasswordComponent = () => <DefaultComponent name="ResetPassword" />;
-const AboutComponent = () => <DefaultComponent name="About" />;
 const ContactComponent = () => <DefaultComponent name="Contact" />;
 const FAQComponent = () => <DefaultComponent name="FAQ" />;
 
@@ -77,7 +76,7 @@ function App() {
             <Route path="/reset-password/:token" element={<ResetPasswordComponent />} />
             <Route path="/jobs" element={<JobListings />} />
             <Route path="/jobs/:id" element={<JobDetailsPage />} />
-            <Route path="/about" element={<AboutComponent />} />
+            <Route path="/about" element={<About />} />
             <Route path="/contact" element={<ContactComponent />} />
             <Route path="/faq" element={<FAQComponent />} />
             
