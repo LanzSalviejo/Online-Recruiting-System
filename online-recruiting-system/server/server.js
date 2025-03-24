@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./config/db');
 const path = require('path');
+require('./utils/eventEmitter'); // Initialize global event emitter
+const jobMatchingScheduler = require('./services/jobMatchingScheduler');
 const app = express();
 
 // Init Middleware
@@ -32,4 +34,10 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+  
+  // Initialize job matching scheduler
+  jobMatchingScheduler.initialize();
+  console.log('Job matching scheduler initialized');
+});
