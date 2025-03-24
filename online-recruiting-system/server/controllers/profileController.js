@@ -340,16 +340,8 @@ exports.addJobPreference = async (req, res) => {
     
     const newPreference = await JobPreference.create(preferenceData);
     
-    // Trigger matching process asynchronously
-    setTimeout(() => {
-      jobMatchingService.processNewPreferenceMatching(userId, newPreference.id)
-        .then(matchResults => {
-          console.log(`Preference matching completed for user ${userId}: ${matchResults.totalMatches} matching jobs found`);
-        })
-        .catch(error => {
-          console.error('Error in background preference matching:', error);
-        });
-    }, 0);
+    // Emit event for preference created - this will trigger the matching process
+    global.eventEmitter.emit('preferenceUpdated', userId, newPreference.id);
     
     res.status(201).json({ 
       success: true, 
@@ -358,6 +350,38 @@ exports.addJobPreference = async (req, res) => {
     });
   } catch (error) {
     console.error('Error adding job preference:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.updateJobPreference = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const preferenceId = req.params.id;
+    
+    // Check if job preference record belongs to user
+    const belongsToUser = await JobPreference.belongsToUser(preferenceId, userId);
+    if (!belongsToUser) {
+      return res.status(403).json({ success: false, message: 'Not authorized to update this job preference record' });
+    }
+    
+    // Update job preference record
+    const updatedPreference = await JobPreference.update(preferenceId, req.body);
+    
+    if (!updatedPreference) {
+      return res.status(404).json({ success: false, message: 'Job preference record not found' });
+    }
+    
+    // Emit event for preference updated - this will trigger the matching process
+    global.eventEmitter.emit('preferenceUpdated', userId, preferenceId);
+    
+    res.status(200).json({ 
+      success: true, 
+      message: 'Job preference updated successfully',
+      data: updatedPreference 
+    });
+  } catch (error) {
+    console.error('Error updating job preference:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
