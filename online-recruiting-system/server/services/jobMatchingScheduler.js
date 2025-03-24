@@ -13,7 +13,7 @@ class JobMatchingScheduler {
     this.matchingSchedule = '0 * * * *';
     
     // Schedule for checking after job due dates - runs daily at midnight
-    this.dueDateSchedule = '0 0 * * *';
+    this.dueDateSchedule = '0 0 * * *'; // Fixed typo from "dueeDateSchedule"
     
     this.isInitialized = false;
   }
@@ -55,7 +55,7 @@ class JobMatchingScheduler {
    * Start the due date checker
    */
   startDueDateChecker() {
-    cron.schedule(this.dueeDateSchedule, async () => {
+    cron.schedule(this.dueDateSchedule, async () => { // Fixed typo from "dueeDateSchedule"
       try {
         logger.info('Running job due date check');
         await this.checkJobsDueToday();
