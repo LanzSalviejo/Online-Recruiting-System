@@ -10,9 +10,6 @@ exports.getPendingApprovals = async (req, res) => {
   try {
     console.log('Executing HR approvals query...');
     
-    // The key fix: only check if is_approved is false
-    // Don't check is_rejected at all since the account you're looking for
-    // has is_rejected = false
     const query = `
     SELECT 
         u.id,
@@ -30,6 +27,7 @@ exports.getPendingApprovals = async (req, res) => {
     WHERE 
         u.account_type = 'hr' 
         AND hr.is_approved = false
+        AND hr.is_rejected = false
     ORDER BY 
         u.created_at DESC
     `;
