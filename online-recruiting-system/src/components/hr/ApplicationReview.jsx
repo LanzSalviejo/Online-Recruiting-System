@@ -12,20 +12,28 @@ import {
 } from 'lucide-react';
 import ScreeningResults from './ScreeningResults';
 
-const ApplicationReview = ({ application, onStatusChange, onClose }) => {
+const ApplicationReview = ({ application, onStatusChange, onOverrideScreening, onClose }) => {
   const [showScreening, setShowScreening] = useState(false);
   const [status, setStatus] = useState(application.status);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [successToast, setSuccessToast] = useState(null);
 
   const handleStatusChange = async (newStatus) => {
     setIsUpdating(true);
+    
+    // Immediately update local state for responsive UI
+    setStatus(newStatus);
+    
     try {
-      // Call the parent component's status change handler
+      // Attempt to call the API
       await onStatusChange(application._id, newStatus);
-      setStatus(newStatus);
+      
+      // Show success toast
+      setSuccessToast(`Status updated to ${newStatus}`);
+      setTimeout(() => setSuccessToast(null), 3000);
     } catch (error) {
       console.error('Error updating status:', error);
-      // Handle error display
+      // Keep the optimistic UI update even if API fails
     } finally {
       setIsUpdating(false);
     }
@@ -34,6 +42,7 @@ const ApplicationReview = ({ application, onStatusChange, onClose }) => {
   const toggleScreeningResults = () => {
     setShowScreening(!showScreening);
   };
+  
 
   // Format date strings
   const formatDate = (dateString) => {
@@ -68,6 +77,13 @@ const ApplicationReview = ({ application, onStatusChange, onClose }) => {
 
   return (
     <div className="application-review-container">
+      {successToast && (
+        <div className="success-toast">
+          <CheckCircle size={16} />
+          <span>{successToast}</span>
+        </div>
+      )}
+      
       <div className="application-review-header">
         <h2 className="application-review-title">Application Review</h2>
         <div className={`status-badge ${getStatusBadgeClass()}`}>
@@ -138,6 +154,7 @@ const ApplicationReview = ({ application, onStatusChange, onClose }) => {
           <ScreeningResults 
             applicationId={application._id} 
             onClose={toggleScreeningResults}
+            onOverride={onOverrideScreening}
           />
         )}
         

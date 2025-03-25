@@ -81,3 +81,6 @@
 [2025-03-25T21:00:00.113Z] [INFO] Checking for new job matches
 [2025-03-25T21:00:00.120Z] [INFO] Completed checking matches for 0 users
 [2025-03-25T21:37:10.164Z] [INFO] New job posted with ID: 4, processing matches
+[2025-03-25T22:00:00.896Z] [INFO] Running scheduled job matching check
+[2025-03-25T22:00:00.896Z] [INFO] Checking for new job matches
+[2025-03-25T22:00:01.833Z] [INFO] Completed checking matches for 1 users
