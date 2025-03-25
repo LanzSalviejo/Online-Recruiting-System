@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Trash2, X } from 'lucide-react';
 import api from '../../services/api';
-import { toast } from 'react-toastify';
 
 const PreferencesForm = () => {
   const navigate = useNavigate();
@@ -11,8 +10,8 @@ const PreferencesForm = () => {
   
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
-    positionType: '',
     category: '',
+    positionType: '',
     location: '',
     minSalary: '',
     keywords: ''
@@ -65,11 +64,11 @@ const PreferencesForm = () => {
       if (isEditing) {
         // Update existing preference
         await api.put(`/profile/preferences/${id}`, formData);
-        toast.success('Job preference updated successfully');
+        alert('Job preference updated successfully');
       } else {
         // Add new preference
         await api.post('/profile/preferences', formData);
-        toast.success('Job preference added successfully');
+        alert('Job preference added successfully');
       }
       
       // Redirect back to profile page
@@ -87,7 +86,7 @@ const PreferencesForm = () => {
     try {
       setLoading(true);
       await api.delete(`/profile/preferences/${id}`);
-      toast.success('Job preference deleted successfully');
+      alert('Job preference deleted successfully');
       navigate('/profile');
     } catch (err) {
       console.error('Error deleting job preference:', err);
@@ -98,9 +97,11 @@ const PreferencesForm = () => {
 
   if (fetchLoading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p className="loading-text">Loading...</p>
+      <div className="page-container">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -118,7 +119,7 @@ const PreferencesForm = () => {
       {error && (
         <div className="error-message">
           {error}
-          <button className="error-close" onClick={() => setError(null)}>
+          <button className="error-dismiss" onClick={() => setError(null)}>
             <X size={18} />
           </button>
         </div>

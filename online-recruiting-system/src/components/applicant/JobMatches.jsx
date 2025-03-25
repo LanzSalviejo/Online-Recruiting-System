@@ -78,7 +78,7 @@ const JobMatches = () => {
           <div key={match.jobId} className="job-match-card">
             <div className="job-match-header">
               <h4 className="job-match-title">
-                <Link to={`/jobs/${match.jobId}`}>{match.title}</Link>
+                <Link to={`/jobs/${job.id || job._id}`}>{match.title}</Link>
               </h4>
               <div className="match-score">
                 <div className="match-score-value">{match.matchScore}%</div>
@@ -109,7 +109,7 @@ const JobMatches = () => {
               <div className="job-match-due-date">
                 Due: {formatDate(match.dueDate)}
               </div>
-              <Link to={`/jobs/${match.jobId}`} className="job-match-view-button">
+              <Link to={`/jobs/${job.id || job._id}`} className="job-match-view-button">
                 View Details
               </Link>
             </div>
