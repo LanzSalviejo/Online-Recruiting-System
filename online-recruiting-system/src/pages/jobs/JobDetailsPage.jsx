@@ -22,6 +22,8 @@ const JobDetailsPage = () => {
           // Ensure dates are properly formatted
           postDate: response.data.post_date || response.data.postDate,
           dueDate: response.data.due_date || response.data.dueDate,
+          // Ensure company name is properly extracted
+          companyName: response.data.company_name || response.data.companyName || "Unknown Company",
           // Ensure education and experience fields exist
           minEducationLevel: response.data.min_education_level || response.data.minEducationLevel || "Not specified",
           minExperience: response.data.min_experience || response.data.minExperience || 0
@@ -40,17 +42,14 @@ const JobDetailsPage = () => {
     fetchJob();
   }, [id]);
 
-  const handleApply = async (jobId) => {
-    // First, make sure we have a valid job ID
-    if (!jobId || jobId === 'undefined') {
+  const handleApply = async () => {
+    if (!job || !job.id) {
       alert('Invalid job ID. Cannot submit application.');
       return;
     }
   
     try {
       setApplyLoading(true);
-      // Use the job ID from the current job object, not the parameter
-      // This ensures we're using the correct ID even if the parameter is wrong
       const actualJobId = job.id || job._id;
       
       console.log('Submitting application for job ID:', actualJobId);
