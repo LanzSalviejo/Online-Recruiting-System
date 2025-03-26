@@ -23,6 +23,7 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/admin/hr-approvals', require('./routes/hrApprovals'));
 app.use('/api', require('./routes/home'));
+app.use('/api/reports', require('./routes/reports'));
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
