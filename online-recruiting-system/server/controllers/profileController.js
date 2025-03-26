@@ -80,6 +80,9 @@ exports.updatePersonalInfo = async (req, res) => {
       postalCode,
       companyName
     } = req.body;
+    
+    console.log('Updating profile for user:', userId);
+    console.log('Received data:', req.body);
 
     // Start a transaction
     const client = await pool.connect();
@@ -93,7 +96,8 @@ exports.updatePersonalInfo = async (req, res) => {
         WHERE id = $3
         RETURNING *
       `;
-      await client.query(updateUserQuery, [firstName, lastName, userId]);
+      const userResult = await client.query(updateUserQuery, [firstName, lastName, userId]);
+      console.log('Updated user record:', userResult.rows[0]);
 
       // Update profile-specific tables based on account type
       if (req.user.accountType === 'applicant') {
@@ -109,15 +113,33 @@ exports.updatePersonalInfo = async (req, res) => {
             UPDATE applicants
             SET phone_number = $1, date_of_birth = $2, street = $3, city = $4, postal_code = $5
             WHERE user_id = $6
+            RETURNING *
           `;
-          await client.query(updateApplicantQuery, [phoneNumber, dateOfBirth, street, city, postalCode, userId]);
+          const applicantResult = await client.query(updateApplicantQuery, [
+            phoneNumber || null, 
+            dateOfBirth || null, 
+            street || null, 
+            city || null, 
+            postalCode || null, 
+            userId
+          ]);
+          console.log('Updated applicant record:', applicantResult.rows[0]);
         } else {
           // Create new profile
           const insertApplicantQuery = `
             INSERT INTO applicants (user_id, phone_number, date_of_birth, street, city, postal_code)
             VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING *
           `;
-          await client.query(insertApplicantQuery, [userId, phoneNumber, dateOfBirth, street, city, postalCode]);
+          const applicantResult = await client.query(insertApplicantQuery, [
+            userId, 
+            phoneNumber || null, 
+            dateOfBirth || null, 
+            street || null, 
+            city || null, 
+            postalCode || null
+          ]);
+          console.log('Inserted new applicant record:', applicantResult.rows[0]);
         }
       } else if (req.user.accountType === 'hr') {
         // Check if HR profile exists
@@ -132,25 +154,52 @@ exports.updatePersonalInfo = async (req, res) => {
             UPDATE hr_staff
             SET phone_number = $1, company_name = $2
             WHERE user_id = $3
+            RETURNING *
           `;
-          await client.query(updateHRQuery, [phoneNumber, companyName, userId]);
+          const hrResult = await client.query(updateHRQuery, [
+            phoneNumber || null, 
+            companyName || null, 
+            userId
+          ]);
+          console.log('Updated HR record:', hrResult.rows[0]);
         } else {
-          // Create new profile (unlikely scenario but handled for completeness)
+          // Create new profile
           const insertHRQuery = `
             INSERT INTO hr_staff (user_id, phone_number, company_name)
             VALUES ($1, $2, $3)
+            RETURNING *
           `;
-          await client.query(insertHRQuery, [userId, phoneNumber, companyName]);
+          const hrResult = await client.query(insertHRQuery, [
+            userId, 
+            phoneNumber || null, 
+            companyName || null
+          ]);
+          console.log('Inserted new HR record:', hrResult.rows[0]);
         }
       }
 
       await client.query('COMMIT');
 
-      res.status(200).json({
+      // Return updated user data
+      const responseData = {
         success: true,
-        message: 'Profile updated successfully'
-      });
+        message: 'Profile updated successfully',
+        data: {
+          firstName,
+          lastName,
+          phoneNumber,
+          dateOfBirth,
+          street,
+          city,
+          postalCode,
+          companyName
+        }
+      };
+      
+      console.log('Sending response:', responseData);
+      res.status(200).json(responseData);
     } catch (error) {
+      console.error('Transaction error:', error);
       await client.query('ROLLBACK');
       throw error;
     } finally {

@@ -47,6 +47,9 @@ import QualificationReport from './pages/admin/QualificationReport';
 
 // Profile pages
 import ProfilePage from './pages/Profile';
+import EducationForm from './pages/profile/EducationForm';
+import ExperienceForm from './pages/profile/ExperienceForm';
+import PreferencesForm from './pages/profile/PreferencesForm';
 
 // Helpers
 import PrivateRoute from './components/auth/PrivateRoute';
@@ -127,8 +130,10 @@ function App() {
               path="/job-postings" 
               element={
                 <PrivateRoute>
-                  <RoleRoute allowedRoles={['hr']}>
-                    <JobPostings />
+                  <RoleRoute allowedRoles={['hr', 'admin']}>
+                    <MainLayout>
+                      <JobPostings />
+                    </MainLayout>
                   </RoleRoute>
                 </PrivateRoute>
               } 
@@ -262,6 +267,54 @@ function App() {
               element={
                 <PrivateRoute>
                   <ProfilePage />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/education/add" 
+              element={
+                <PrivateRoute>
+                  <EducationForm />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/education/edit/:id" 
+              element={
+                <PrivateRoute>
+                  <EducationForm />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/experience/add" 
+              element={
+                <PrivateRoute>
+                  <ExperienceForm />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/experience/edit/:id" 
+              element={
+                <PrivateRoute>
+                  <ExperienceForm />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/preferences/add" 
+              element={
+                <PrivateRoute>
+                  <PreferencesForm />
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/profile/preferences/edit/:id" 
+              element={
+                <PrivateRoute>
+                  <PreferencesForm />
                 </PrivateRoute>
               } 
             />

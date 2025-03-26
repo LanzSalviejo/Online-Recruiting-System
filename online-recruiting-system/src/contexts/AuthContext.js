@@ -75,15 +75,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Update profile function
-  const updateProfile = async (profileData) => {
+  const updateProfile = async (userData) => {
     try {
-      setError(null);
-      const response = await api.put('/users/profile', profileData);
-      setUser(response.data);
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Update profile failed');
-      throw err;
+      // Only update the context state without making an API call
+      setUser(prev => ({
+        ...prev,
+        ...userData
+      }));
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating user profile in context:', error);
+      throw error;
     }
   };
 

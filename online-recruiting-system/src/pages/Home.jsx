@@ -162,7 +162,7 @@ const Home = () => {
               <div key={job._id} className="featured-job-card">
                 <div className="featured-job-content">
                   <h3 className="featured-job-title">
-                    <Link to={`/jobs/${job._id}`}>{job.title}</Link>
+                    <Link to={`/jobs/${job.id || job._id}`}>{job.title}</Link>
                   </h3>
                   <p className="featured-job-company">{job.companyName}</p>
                   <div className="featured-job-meta">
@@ -173,7 +173,7 @@ const Home = () => {
                 </div>
                 <div className="featured-job-footer">
                   <span className="featured-job-date">Posted on {formatDate(job.postDate)}</span>
-                  <Link to={`/jobs/${job._id}`} className="featured-job-button">
+                  <Link to={`/jobs/${job.id || job._id}`} className="featured-job-button">
                     View Details
                   </Link>
                 </div>

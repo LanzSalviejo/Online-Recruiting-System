@@ -24,3 +24,63 @@
 [2025-03-24T21:00:00.215Z] [INFO] Completed checking matches for 0 users
 [2025-03-24T21:03:00.851Z] [INFO] Job matching scheduler initialized
 [2025-03-24T21:03:00.852Z] [INFO] Auto-screening service initialized
+[2025-03-24T21:10:34.271Z] [INFO] Job matching scheduler initialized
+[2025-03-24T21:10:34.272Z] [INFO] Auto-screening service initialized
+[2025-03-24T21:12:04.853Z] [INFO] Job matching scheduler initialized
+[2025-03-24T21:12:04.854Z] [INFO] Auto-screening service initialized
+[2025-03-24T21:19:12.040Z] [INFO] Job matching scheduler initialized
+[2025-03-24T21:19:12.041Z] [INFO] Auto-screening service initialized
+[2025-03-24T22:00:00.703Z] [INFO] Running scheduled job matching check
+[2025-03-24T22:00:00.703Z] [INFO] Checking for new job matches
+[2025-03-24T22:00:00.710Z] [INFO] Completed checking matches for 0 users
+[2025-03-24T22:26:14.224Z] [INFO] New job posted with ID: 2, processing matches
+[2025-03-24T22:32:46.153Z] [INFO] Job matching scheduler initialized
+[2025-03-24T22:32:46.155Z] [INFO] Auto-screening service initialized
+[2025-03-24T22:34:44.161Z] [INFO] Job matching scheduler initialized
+[2025-03-24T22:34:44.162Z] [INFO] Auto-screening service initialized
+[2025-03-24T23:00:00.819Z] [INFO] Running scheduled job matching check
+[2025-03-24T23:00:00.820Z] [INFO] Checking for new job matches
+[2025-03-24T23:00:00.826Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T00:00:00.785Z] [INFO] Running scheduled job matching check
+[2025-03-25T00:00:00.796Z] [INFO] Checking for new job matches
+[2025-03-25T00:00:00.830Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T00:35:33.042Z] [INFO] Job matching scheduler initialized
+[2025-03-25T00:35:33.044Z] [INFO] Auto-screening service initialized
+[2025-03-25T01:00:00.631Z] [INFO] Running scheduled job matching check
+[2025-03-25T01:00:00.631Z] [INFO] Checking for new job matches
+[2025-03-25T01:00:00.639Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T02:00:00.713Z] [INFO] Running scheduled job matching check
+[2025-03-25T02:00:00.713Z] [INFO] Checking for new job matches
+[2025-03-25T02:00:00.719Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T03:00:00.165Z] [INFO] Running scheduled job matching check
+[2025-03-25T03:00:00.166Z] [INFO] Checking for new job matches
+[2025-03-25T03:00:00.172Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T04:00:00.438Z] [INFO] Running scheduled job matching check
+[2025-03-25T04:00:00.438Z] [INFO] Checking for new job matches
+[2025-03-25T04:00:00.445Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T04:35:45.694Z] [INFO] New job posted with ID: 3, processing matches
+[2025-03-25T05:00:00.183Z] [INFO] Running scheduled job matching check
+[2025-03-25T05:00:00.184Z] [INFO] Checking for new job matches
+[2025-03-25T05:00:00.191Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T06:00:00.273Z] [INFO] Running scheduled job matching check
+[2025-03-25T06:00:00.286Z] [INFO] Checking for new job matches
+[2025-03-25T06:00:00.344Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T17:00:00.164Z] [INFO] Running scheduled job matching check
+[2025-03-25T17:00:00.173Z] [INFO] Checking for new job matches
+[2025-03-25T17:00:00.221Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T18:00:00.075Z] [INFO] Running scheduled job matching check
+[2025-03-25T18:00:00.075Z] [INFO] Checking for new job matches
+[2025-03-25T18:00:00.081Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T19:00:00.081Z] [INFO] Running scheduled job matching check
+[2025-03-25T19:00:00.082Z] [INFO] Checking for new job matches
+[2025-03-25T19:00:00.096Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T20:00:00.116Z] [INFO] Running scheduled job matching check
+[2025-03-25T20:00:00.117Z] [INFO] Checking for new job matches
+[2025-03-25T20:00:00.125Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T21:00:00.113Z] [INFO] Running scheduled job matching check
+[2025-03-25T21:00:00.113Z] [INFO] Checking for new job matches
+[2025-03-25T21:00:00.120Z] [INFO] Completed checking matches for 0 users
+[2025-03-25T21:37:10.164Z] [INFO] New job posted with ID: 4, processing matches
+[2025-03-25T22:00:00.896Z] [INFO] Running scheduled job matching check
+[2025-03-25T22:00:00.896Z] [INFO] Checking for new job matches
+[2025-03-25T22:00:01.833Z] [INFO] Completed checking matches for 1 users

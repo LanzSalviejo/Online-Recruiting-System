@@ -11,7 +11,8 @@ import {
   ChevronDown, 
   Search,
   Users,
-  AlertTriangle
+  AlertTriangle,
+  User
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -24,16 +25,26 @@ const JobPostings = () => {
   const [filter, setFilter] = useState('active'); // 'active', 'all', 'expired'
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'alphabetical', 'applications'
   const [showSortOptions, setShowSortOptions] = useState(false);
+  const isAdmin = user?.accountType === 'admin';
 
   useEffect(() => {
     const fetchJobPostings = async () => {
       try {
         setLoading(true);
         
-        // Fetch all job postings created by this HR user
-        const response = await api.get('/hr/job-postings');
-        setJobPostings(response.data);
+        // Different endpoint for admin vs HR
+        const endpoint = isAdmin 
+          ? '/admin/jobs' // Admin endpoint for all jobs
+          : '/hr/job-postings'; // HR sees only their jobs
+          
+        const response = await api.get(endpoint);
         
+        // For admin endpoint, extract jobs from the response structure
+        const jobs = isAdmin && response.data.jobs 
+          ? response.data.jobs 
+          : response.data;
+          
+        setJobPostings(jobs);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching job postings:', err);
@@ -43,7 +54,7 @@ const JobPostings = () => {
     };
 
     fetchJobPostings();
-  }, []);
+  }, [isAdmin]);
 
   // Filter job postings based on filter state
   const getFilteredJobs = () => {
@@ -69,7 +80,8 @@ const JobPostings = () => {
         job.title.toLowerCase().includes(term) ||
         job.companyName.toLowerCase().includes(term) ||
         job.location.toLowerCase().includes(term) ||
-        job.categoryName.toLowerCase().includes(term)
+        (job.categoryName && job.categoryName.toLowerCase().includes(term)) ||
+        (isAdmin && job.creatorName && job.creatorName.toLowerCase().includes(term))
       );
     }
 
@@ -88,7 +100,12 @@ const JobPostings = () => {
   const handleDeleteJob = async (jobId) => {
     if (window.confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) {
       try {
-        await api.delete(`/jobs/${jobId}`);
+        // Different endpoint depending on user type
+        const endpoint = isAdmin
+          ? `/admin/jobs/${jobId}`  // Admin endpoint
+          : `/jobs/${jobId}`;       // Regular endpoint
+          
+        await api.delete(endpoint);
         
         // Update local state to remove the deleted job
         setJobPostings(jobPostings.filter(job => job._id !== jobId));
@@ -141,6 +158,28 @@ const JobPostings = () => {
     }
   };
 
+  // For admin users, render the creator info
+  const renderCreatorInfo = (job) => {
+    if (isAdmin && job.creatorName) {
+      return (
+        <div className="job-posting-meta-item job-creator-info">
+          <User size={16} className="job-posting-meta-icon" />
+          <span>{job.creatorName}</span>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Check if user can edit/delete this job
+  const canModifyJob = (job) => {
+    // Admins can modify any job
+    if (isAdmin) return true;
+    
+    // HR users can only modify their own jobs
+    return job.creatorId === user.id;
+  };
+
   const filteredJobs = getFilteredJobs();
 
   if (loading) {
@@ -166,14 +205,19 @@ const JobPostings = () => {
   return (
     <div className="page-container">
       <div className="page-header-with-actions">
-        <h1 className="page-title">Manage Job Postings</h1>
-        <Link 
-          to="/post-job" 
-          className="primary-button"
-        >
-          <Plus size={16} />
-          Post New Job
-        </Link>
+        <h1 className="page-title">
+          {isAdmin ? 'All Job Postings' : 'Manage Job Postings'}
+        </h1>
+        {/* Only show Post New Job button for HR users */}
+        {!isAdmin && (
+          <Link 
+            to="/post-job" 
+            className="primary-button"
+          >
+            <Plus size={16} />
+            Post New Job
+          </Link>
+        )}
       </div>
       
       {/* Filter and Search */}
@@ -207,7 +251,7 @@ const JobPostings = () => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search job title, company..."
+                placeholder={isAdmin ? "Search job title, company, creator..." : "Search job title, company..."}
                 className="search-input"
               />
             </div>
@@ -266,10 +310,12 @@ const JobPostings = () => {
           <h3 className="no-jobs-title">No job postings found</h3>
           <p className="no-jobs-message">
             {filter !== 'all' 
-              ? `You don't have any ${filter === 'active' ? 'active' : 'expired'} job postings.` 
+              ? `No ${filter === 'active' ? 'active' : 'expired'} job postings found.` 
               : searchTerm
                 ? `No job postings match your search.`
-                : `You haven't created any job postings yet.`}
+                : isAdmin 
+                  ? `There are no job postings in the system yet.`
+                  : `You haven't created any job postings yet.`}
           </p>
           {filter !== 'all' ? (
             <button 
@@ -278,12 +324,12 @@ const JobPostings = () => {
             >
               View all job postings
             </button>
-          ) : (
+          ) : (!isAdmin && (
             <Link to="/post-job" className="primary-button">
               <Plus size={16} />
               Post New Job
             </Link>
-          )}
+          ))}
         </div>
       ) : (
         <div className="job-postings-list">
@@ -314,6 +360,7 @@ const JobPostings = () => {
                       ? `Expired on ${formatDate(job.dueDate)}` 
                       : `Closes on ${formatDate(job.dueDate)}`}
                   </div>
+                  {renderCreatorInfo(job)}
                 </div>
                 
                 <div className="job-posting-dates">
@@ -347,22 +394,28 @@ const JobPostings = () => {
                     <Users size={16} />
                     <span className="action-label">Review</span>
                   </Link>
-                  <Link 
-                    to={`/edit-job/${job._id}`} 
-                    className="job-posting-action-button job-posting-action-edit"
-                    title="Edit Job Posting"
-                  >
-                    <Edit size={16} />
-                    <span className="action-label">Edit</span>
-                  </Link>
-                  <button 
-                    onClick={() => handleDeleteJob(job._id)} 
-                    className="job-posting-action-button job-posting-action-delete"
-                    title="Delete Job Posting"
-                  >
-                    <Trash2 size={16} />
-                    <span className="action-label">Delete</span>
-                  </button>
+
+                  {/* Only show edit/delete for admin or the creator */}
+                  {canModifyJob(job) && (
+                    <>
+                      <Link 
+                        to={`/edit-job/${job._id}`} 
+                        className="job-posting-action-button job-posting-action-edit"
+                        title="Edit Job Posting"
+                      >
+                        <Edit size={16} />
+                        <span className="action-label">Edit</span>
+                      </Link>
+                      <button 
+                        onClick={() => handleDeleteJob(job._id)} 
+                        className="job-posting-action-button job-posting-action-delete"
+                        title="Delete Job Posting"
+                      >
+                        <Trash2 size={16} />
+                        <span className="action-label">Delete</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

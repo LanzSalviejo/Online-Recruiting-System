@@ -413,7 +413,9 @@ router.delete('/:id', [auth, roleCheck(['hr', 'admin'])], async (req, res) => {
       return res.status(404).json({ message: 'Job not found' });
     }
     
-    // Check if user is the creator or an admin
+    // Check if user is authorized to delete the job
+    // HR users can only delete their own jobs
+    // Admin users can delete any job
     if (req.user.accountType === 'hr' && jobResult.rows[0].creator_id !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to delete this job' });
     }

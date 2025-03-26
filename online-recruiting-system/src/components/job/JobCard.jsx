@@ -28,7 +28,7 @@ const JobCard = ({ job }) => {
       <div className="job-card-content">
         <div className="job-card-header">
           <h3 className="job-title">
-            <Link to={`/jobs/${job._id}`} className="job-title-link">
+            <Link to={`/jobs/${job.id || job._id}`} className="job-title-link">
               {job.title}
             </Link>
           </h3>
@@ -64,10 +64,7 @@ const JobCard = ({ job }) => {
           <span className="job-post-date">
             Posted: {formatDate(job.postDate)}
           </span>
-          <Link 
-            to={`/jobs/${job._id}`} 
-            className="job-view-button"
-          >
+          <Link to={`/jobs/${job.id || job._id}`} className="job-view-button">
             View Details
           </Link>
         </div>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Trash2, X } from 'lucide-react';
 import api from '../../services/api';
-import { toast } from 'react-toastify';
 
 const EducationForm = () => {
   const navigate = useNavigate();
@@ -67,11 +66,11 @@ const EducationForm = () => {
       if (isEditing) {
         // Update existing education
         await api.put(`/profile/education/${id}`, formData);
-        toast.success('Education updated successfully');
+        alert('Education updated successfully');
       } else {
         // Add new education
         await api.post('/profile/education', formData);
-        toast.success('Education added successfully');
+        alert('Education added successfully');
       }
       
       // Redirect back to profile page
@@ -89,7 +88,7 @@ const EducationForm = () => {
     try {
       setLoading(true);
       await api.delete(`/profile/education/${id}`);
-      toast.success('Education deleted successfully');
+      alert('Education deleted successfully');
       navigate('/profile');
     } catch (err) {
       console.error('Error deleting education:', err);
@@ -100,9 +99,11 @@ const EducationForm = () => {
 
   if (fetchLoading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p className="loading-text">Loading...</p>
+      <div className="page-container">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -120,7 +121,7 @@ const EducationForm = () => {
       {error && (
         <div className="error-message">
           {error}
-          <button className="error-close" onClick={() => setError(null)}>
+          <button className="error-dismiss" onClick={() => setError(null)}>
             <X size={18} />
           </button>
         </div>
