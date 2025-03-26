@@ -239,7 +239,7 @@ const JobCategories = () => {
                   </div>
                 </form>
               ) : (
-                <>
+                <React.Fragment key={`category-view-${category.id}`}>
                   <div className="user-info-header" style={{ 
                     display: 'flex', 
                     justifyContent: 'space-between',
@@ -289,12 +289,12 @@ const JobCategories = () => {
                     </p>
                     
                     {category.jobCount !== undefined && (
-                      <div className="status-indicator status-active" style={{ display: 'inline-flex' }}>
+                      <div key={`job-count-${category.id}`} className="status-indicator status-active" style={{ display: 'inline-flex' }}>
                         {category.jobCount} {category.jobCount === 1 ? 'job' : 'jobs'} in this category
                       </div>
                     )}
                   </div>
-                </>
+                </React.Fragment>
               )}
             </div>
           ))}

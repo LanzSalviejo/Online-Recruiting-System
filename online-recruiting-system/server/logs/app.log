@@ -106,3 +106,13 @@
 [2025-03-26T05:01:53.589Z] [INFO] Auto-screening service initialized
 [2025-03-26T18:41:52.759Z] [INFO] Job matching scheduler initialized
 [2025-03-26T18:41:52.760Z] [INFO] Auto-screening service initialized
+[2025-03-26T18:56:10.060Z] [INFO] New job posted with ID: 5, processing matches
+[2025-03-26T19:00:00.876Z] [INFO] Running scheduled job matching check
+[2025-03-26T19:00:00.876Z] [INFO] Checking for new job matches
+[2025-03-26T19:00:01.651Z] [INFO] Completed checking matches for 1 users
+[2025-03-26T19:16:42.049Z] [INFO] Job matching scheduler initialized
+[2025-03-26T19:16:42.050Z] [INFO] Auto-screening service initialized
+[2025-03-26T19:42:38.434Z] [INFO] Job matching scheduler initialized
+[2025-03-26T19:42:38.435Z] [INFO] Auto-screening service initialized
+[2025-03-26T19:44:39.269Z] [INFO] Job matching scheduler initialized
+[2025-03-26T19:44:39.270Z] [INFO] Auto-screening service initialized

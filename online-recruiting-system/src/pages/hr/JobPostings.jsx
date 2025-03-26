@@ -12,7 +12,8 @@ import {
   Search,
   Users,
   AlertTriangle,
-  User
+  User,
+  CheckCircle
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -26,6 +27,13 @@ const JobPostings = () => {
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'alphabetical', 'applications'
   const [showSortOptions, setShowSortOptions] = useState(false);
   const isAdmin = user?.accountType === 'admin';
+  
+  // New state for delete modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [jobToDelete, setJobToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     const fetchJobPostings = async () => {
@@ -97,22 +105,41 @@ const JobPostings = () => {
     return filtered;
   };
 
-  const handleDeleteJob = async (jobId) => {
-    if (window.confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) {
-      try {
-        // Different endpoint depending on user type
-        const endpoint = isAdmin
-          ? `/admin/jobs/${jobId}`  // Admin endpoint
-          : `/jobs/${jobId}`;       // Regular endpoint
-          
-        await api.delete(endpoint);
+  // Updated delete job function
+  const handleDeleteJob = (job) => {
+    setJobToDelete(job);
+    setShowDeleteModal(true);
+  };
+
+  // Confirm delete function
+  const confirmDelete = async () => {
+    if (!jobToDelete) return;
+    
+    try {
+      setIsDeleting(true);
+      
+      // Different endpoint depending on user type
+      const endpoint = isAdmin
+        ? `/admin/jobs/${jobToDelete._id}`  // Admin endpoint
+        : `/jobs/${jobToDelete._id}`;       // Regular endpoint
         
-        // Update local state to remove the deleted job
-        setJobPostings(jobPostings.filter(job => job._id !== jobId));
-      } catch (err) {
-        console.error('Error deleting job posting:', err);
-        alert('Failed to delete job posting. Please try again.');
-      }
+      await api.delete(endpoint);
+      
+      // Update local state to remove the deleted job
+      setJobPostings(prevJobs => prevJobs.filter(job => job._id !== jobToDelete._id));
+      
+      // Show success message
+      setSuccessMessage("Job posting deleted successfully");
+      setTimeout(() => setSuccessMessage(null), 3000);
+      
+      // Reset modal state
+      setShowDeleteModal(false);
+      setJobToDelete(null);
+      setIsDeleting(false);
+    } catch (err) {
+      console.error('Error deleting job posting:', err);
+      setDeleteError("Failed to delete job posting. Please try again.");
+      setIsDeleting(false);
     }
   };
 
@@ -380,7 +407,7 @@ const JobPostings = () => {
               
               <div className="job-posting-right">
                 <div className="applications-badge">
-                  <Users size={16} className="applications-badge-icon" />
+                <Users size={16} className="applications-badge-icon" />
                   <span className="applications-count">{job.applicationsCount || 0}</span>
                   <span className="applications-label">Applications</span>
                 </div>
@@ -395,31 +422,86 @@ const JobPostings = () => {
                     <span className="action-label">Review</span>
                   </Link>
 
-                  {/* Only show edit/delete for admin or the creator */}
-                  {canModifyJob(job) && (
-                    <>
-                      <Link 
-                        to={`/edit-job/${job._id}`} 
-                        className="job-posting-action-button job-posting-action-edit"
-                        title="Edit Job Posting"
-                      >
-                        <Edit size={16} />
-                        <span className="action-label">Edit</span>
-                      </Link>
-                      <button 
-                        onClick={() => handleDeleteJob(job._id)} 
-                        className="job-posting-action-button job-posting-action-delete"
-                        title="Delete Job Posting"
-                      >
-                        <Trash2 size={16} />
-                        <span className="action-label">Delete</span>
-                      </button>
-                    </>
-                  )}
+                  {/* Edit button - shown for all jobs */}
+                  <Link 
+                    to={`/edit-job/${job._id}`} 
+                    className="job-posting-action-button job-posting-action-edit"
+                    title="Edit Job Posting"
+                  >
+                    <Edit size={16} />
+                    <span className="action-label">Edit</span>
+                  </Link>
+                  
+                  {/* Delete button */}
+                  <button 
+                    onClick={() => handleDeleteJob(job)} 
+                    className="job-posting-action-button job-posting-action-delete"
+                    title="Delete Job Posting"
+                  >
+                    <Trash2 size={16} />
+                    <span className="action-label">Delete</span>
+                  </button>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && jobToDelete && (
+        <div className="delete-modal-overlay">
+          <div className="delete-modal">
+            <div className="delete-modal-header">
+              <AlertTriangle size={24} className="delete-modal-icon" />
+              <h3 className="delete-modal-title">Delete Job Posting</h3>
+            </div>
+            
+            <div className="delete-modal-content">
+              <p>Are you sure you want to delete the following job posting?</p>
+              <div className="delete-job-details">
+                <strong>{jobToDelete.title}</strong>
+                <span>{jobToDelete.companyName || jobToDelete.company_name}</span>
+              </div>
+              <p className="delete-warning">This action cannot be undone.</p>
+              
+              {deleteError && (
+                <div className="delete-error-message">
+                  <AlertTriangle size={16} />
+                  <span>{deleteError}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="delete-modal-actions">
+              <button 
+                className="delete-modal-cancel" 
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setJobToDelete(null);
+                  setDeleteError(null);
+                }}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button 
+                className="delete-modal-confirm" 
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Job'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="success-message">
+          <CheckCircle size={16} />
+          <span>{successMessage}</span>
         </div>
       )}
     </div>
