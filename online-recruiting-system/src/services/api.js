@@ -70,4 +70,62 @@ api.interceptors.response.use(
   }
 );
 
+/**
+ * Fetch monthly category report data
+ * @param {Number} year - Year for the report
+ * @param {Number} month - Month for the report (1-12)
+ * @returns {Promise} - Promise resolving to report data
+ */
+export const getMonthlyCategoryReport = async (year, month) => {
+  const response = await axios.get(`/api/reports/category/monthly/${year}/${month}`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  });
+  return response.data;
+};
+
+/**
+ * Fetch yearly category report data
+ * @param {Number} year - Year for the report
+ * @returns {Promise} - Promise resolving to report data
+ */
+export const getYearlyCategoryReport = async (year) => {
+  const response = await axios.get(`/api/reports/category/yearly/${year}`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  });
+  return response.data;
+};
+
+/**
+ * Fetch monthly qualification report data
+ * @param {Number} year - Year for the report
+ * @param {Number} month - Month for the report (1-12)
+ * @returns {Promise} - Promise resolving to report data
+ */
+export const getMonthlyQualificationReport = async (year, month) => {
+  const response = await axios.get(`/api/reports/qualification/monthly/${year}/${month}`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  });
+  return response.data;
+};
+
+/**
+ * Fetch yearly qualification report data
+ * @param {Number} year - Year for the report
+ * @returns {Promise} - Promise resolving to report data
+ */
+export const getYearlyQualificationReport = async (year) => {
+  const response = await axios.get(`/api/reports/qualification/yearly/${year}`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  });
+  return response.data;
+};
+
 export default api;
