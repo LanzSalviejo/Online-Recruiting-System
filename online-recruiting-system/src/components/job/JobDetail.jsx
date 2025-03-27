@@ -10,7 +10,8 @@ import {
   Award, 
   Clock,
   Share2,
-  BookmarkPlus
+  BookmarkPlus,
+  Edit
 } from 'lucide-react';
 
 const JobDetail = ({ job, onApply, loading }) => {
@@ -325,6 +326,17 @@ const JobDetail = ({ job, onApply, loading }) => {
           >
             {loading ? 'Submitting...' : 'Apply Now'}
           </button>
+          
+          {/* Add Edit button for HR/Admin users only */}
+          {user && (user.accountType === 'hr' || user.accountType === 'admin') && (
+            <Link
+              to={`/edit-job/${job.id || job._id}`}
+              className="job-edit-button"
+            >
+              <Edit size={16} />
+              Edit Job
+            </Link>
+          )}
           
           <Link
             to="/jobs"

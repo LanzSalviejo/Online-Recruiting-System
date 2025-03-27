@@ -4,6 +4,7 @@ const pool = require('../config/db');
 const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleCheck');
 const { check, validationResult } = require('express-validator');
+const JobCategory = require('../models/JobCategory');
 
 /**
  * @route   GET /api/jobs
@@ -543,6 +544,108 @@ router.get('/applications/:id', [auth, roleCheck('hr')], async (req, res) => {
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching job applications:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @route   DELETE /api/jobs/categories/:id
+ * @desc    Delete a job category
+ * @access  Private (Admin only)
+ */
+router.delete('/categories/:id', [auth, roleCheck('admin')], async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    
+    // Check if the category exists first
+    const category = await JobCategory.findById(id);
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+    
+    // Try to delete the category
+    const deleted = await JobCategory.delete(id);
+    
+    if (!deleted) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+    
+    res.json({ message: 'Category deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting job category:', error);
+    
+    if (error.message.includes('being used by job postings')) {
+      return res.status(400).json({ message: error.message });
+    }
+    
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @route   POST /api/jobs/categories
+ * @desc    Create a new job category
+ * @access  Private (Admin only)
+ */
+router.post('/categories', [auth, roleCheck('admin')], async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ message: 'Category name is required' });
+    }
+    
+    // Check if category with this name already exists
+    const existingCategory = await JobCategory.findByName(name);
+    if (existingCategory) {
+      return res.status(400).json({ message: 'Category with this name already exists' });
+    }
+    
+    // Create new category
+    const newCategory = await JobCategory.create({ name, description });
+    
+    res.status(201).json(newCategory);
+  } catch (error) {
+    console.error('Error creating job category:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @route   PUT /api/jobs/categories/:id
+ * @desc    Update a job category
+ * @access  Private (Admin only)
+ */
+router.put('/categories/:id', [auth, roleCheck('admin')], async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { name, description } = req.body;
+    
+    // Validate input
+    if (!name) {
+      return res.status(400).json({ message: 'Category name is required' });
+    }
+    
+    // Check if category exists
+    const category = await JobCategory.findById(id);
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+    
+    // If name changed, check if new name is unique
+    if (name !== category.name) {
+      const existingCategory = await JobCategory.findByName(name);
+      if (existingCategory && existingCategory._id !== id) {
+        return res.status(400).json({ message: 'Category with this name already exists' });
+      }
+    }
+    
+    // Update category
+    const updatedCategory = await JobCategory.update(id, { name, description });
+    
+    res.json(updatedCategory);
+  } catch (error) {
+    console.error('Error updating job category:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
