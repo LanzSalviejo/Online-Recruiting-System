@@ -19,7 +19,7 @@ import Home from './pages/Home';
 import JobListings from './pages/jobs/JobListings';
 import JobDetailsPage from './pages/jobs/JobDetailsPage';
 import About from './pages/About';
-// import Contact from './pages/Contact';
+import Contact from './pages/Contact';
 // import FAQ from './pages/FAQ';
 
 // Applicant pages
@@ -62,7 +62,6 @@ const DefaultComponent = ({ name }) => <div>Component {name} not implemented yet
 // Create placeholder component functions directly
 const ForgotPasswordComponent = () => <DefaultComponent name="ForgotPassword" />;
 const ResetPasswordComponent = () => <DefaultComponent name="ResetPassword" />;
-const ContactComponent = () => <DefaultComponent name="Contact" />;
 const FAQComponent = () => <DefaultComponent name="FAQ" />;
 
 function App() {
@@ -80,7 +79,7 @@ function App() {
             <Route path="/jobs" element={<JobListings />} />
             <Route path="/jobs/:id" element={<JobDetailsPage />} />
             <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<ContactComponent />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQComponent />} />
             
             {/* Applicant Routes */}
