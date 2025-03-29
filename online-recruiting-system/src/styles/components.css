@@ -1835,6 +1835,29 @@
   width: 100%;
 }
 
+/* About Page Styles */
+.about-container {
+  width: 100%;
+}
+
+.about-button {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.3s;
+  background-color: #2563eb;
+  color: white;
+}
+
+.about-button:hover {
+  background-color: #1d4ed8;
+}
+
+.about-button-icon {
+  margin-right: 0.5rem;
+}
+
 /* Hero Section */
 .hero-section {
   background-color: #f0f7ff;
