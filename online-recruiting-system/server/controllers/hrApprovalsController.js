@@ -18,7 +18,8 @@ exports.getPendingApprovals = async (req, res) => {
         u.email,
         u.created_at AS "createdAt",
         hr.working_id AS "workingId",
-        hr.phone_number AS "phoneNumber"
+        hr.phone_number AS "phoneNumber",
+        hr.company_name AS "companyName"
     FROM 
         users u
     JOIN 
@@ -26,6 +27,7 @@ exports.getPendingApprovals = async (req, res) => {
     WHERE 
         u.account_type = 'hr' 
         AND hr.is_approved = false
+        AND hr.is_rejected = false
     ORDER BY 
         u.created_at DESC
     `;
@@ -57,13 +59,15 @@ exports.updateApprovalStatus = async (req, res) => {
     const updateQuery = `
       UPDATE hr_staff
       SET 
-        is_approved = $1
-      WHERE user_id = $2
+        is_approved = $1,
+        is_rejected = $2
+      WHERE user_id = $3
       RETURNING *
     `;
     
     const result = await pool.query(updateQuery, [
       approved, 
+      !approved, // Set is_rejected to the opposite of approved
       id
     ]);
     
