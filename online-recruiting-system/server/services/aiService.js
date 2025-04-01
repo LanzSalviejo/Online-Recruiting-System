@@ -285,8 +285,6 @@ const matchJobWithPreferences = async (jobPosting, applicantPreferences) => {
    * Helper functions for region matching and related categories
    */
   const getRegionFromLocation = (location) => {
-    // This is a simplified implementation
-    // In a real system, you would use a geocoding service or a predefined region mapping
     const locationLower = location.toLowerCase();
     
     // Example mapping for Canadian provinces/regions
@@ -305,12 +303,8 @@ const matchJobWithPreferences = async (jobPosting, applicantPreferences) => {
   };
   
   const getRelatedCategories = async (categoryId) => {
-    // In a real system, this would query a category relationship mapping
-    // For this example, we'll return hardcoded related categories
-    
     // Example category relationships
     const categoryRelationships = {
-      // Example IDs - in a real system, these would be actual MongoDB ObjectIds
       'computer_science': ['information_technology', 'software_development', 'data_science'],
       'information_technology': ['computer_science', 'cybersecurity', 'network_administration'],
       'accounting': ['finance', 'banking', 'business_administration'],

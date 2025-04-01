@@ -40,19 +40,6 @@ const EditUser = () => {
     const fetchUser = async () => {
       try {
         setLoading(true);
-        
-        // In a real application, you would call your API
-        // const response = await api.get(`/admin/users/${id}`);
-        // setUser(response.data);
-        // setFormData({
-        //   firstName: response.data.firstName,
-        //   lastName: response.data.lastName,
-        //   email: response.data.email,
-        //   accountType: response.data.accountType,
-        //   isActive: response.data.isActive,
-        //   isVerified: response.data.isVerified
-        // });
-        
         // Mock data for demonstration
         setTimeout(() => {
           const mockUser = {
@@ -173,11 +160,6 @@ const EditUser = () => {
     
     try {
       setSaving(true);
-      
-      // In a real application, you would call your API
-      // for user update and optionally password reset
-      
-      // Simulate API call with timeout
       setTimeout(() => {
         // Set success message
         setSuccess('User updated successfully');

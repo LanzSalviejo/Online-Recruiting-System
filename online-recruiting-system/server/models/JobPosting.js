@@ -1,9 +1,5 @@
 const pool = require('../config/db');
 
-/**
- * JobPosting model for PostgreSQL
- * Uses Data Access Object (DAO) pattern
- */
 const JobPosting = {
   /**
    * Find all job postings with filtering and pagination

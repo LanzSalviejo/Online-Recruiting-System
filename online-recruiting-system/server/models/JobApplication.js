@@ -1,9 +1,5 @@
 const pool = require('../config/db');
 
-/**
- * JobApplication model for PostgreSQL
- * Uses Data Access Object (DAO) pattern
- */
 const JobApplication = {
   /**
    * Find application by ID

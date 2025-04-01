@@ -116,3 +116,24 @@
 [2025-03-26T19:42:38.435Z] [INFO] Auto-screening service initialized
 [2025-03-26T19:44:39.269Z] [INFO] Job matching scheduler initialized
 [2025-03-26T19:44:39.270Z] [INFO] Auto-screening service initialized
+[2025-03-26T21:00:00.122Z] [INFO] Running scheduled job matching check
+[2025-03-26T21:00:00.127Z] [INFO] Checking for new job matches
+[2025-03-26T21:00:01.217Z] [INFO] Completed checking matches for 1 users
+[2025-04-01T00:28:06.445Z] [INFO] Job matching scheduler initialized
+[2025-04-01T00:28:06.448Z] [INFO] Auto-screening service initialized
+[2025-04-01T01:00:00.611Z] [INFO] Running scheduled job matching check
+[2025-04-01T01:00:00.612Z] [INFO] Checking for new job matches
+[2025-04-01T01:00:01.910Z] [INFO] Completed checking matches for 1 users
+[2025-04-01T02:00:00.658Z] [INFO] Running scheduled job matching check
+[2025-04-01T02:00:00.659Z] [INFO] Checking for new job matches
+[2025-04-01T02:00:02.539Z] [INFO] Completed checking matches for 1 users
+[2025-04-01T03:00:00.720Z] [INFO] Running scheduled job matching check
+[2025-04-01T03:00:00.720Z] [INFO] Checking for new job matches
+[2025-04-01T03:00:01.961Z] [INFO] Completed checking matches for 1 users
+[2025-04-01T04:00:00.741Z] [INFO] Running scheduled job matching check
+[2025-04-01T04:00:00.742Z] [INFO] Checking for new job matches
+[2025-04-01T04:00:01.823Z] [INFO] Completed checking matches for 1 users
+[2025-04-01T04:16:13.691Z] [INFO] Job matching scheduler initialized
+[2025-04-01T04:16:13.692Z] [INFO] Auto-screening service initialized
+[2025-04-01T04:17:46.001Z] [INFO] Job matching scheduler initialized
+[2025-04-01T04:17:46.002Z] [INFO] Auto-screening service initialized

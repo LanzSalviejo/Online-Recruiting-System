@@ -1,8 +1,8 @@
 const pool = require('../config/db');
 
 const WorkExperience = {
-  // Find all work experience records for a user
-  findByUserId: async (userId) => {
+  // Get all work experience records for a user
+  getByUserId: async (userId) => {
     const result = await pool.query(
       'SELECT * FROM work_experience WHERE user_id = $1 ORDER BY CASE WHEN current_job = true THEN 0 ELSE 1 END, start_date DESC',
       [userId]
@@ -10,8 +10,8 @@ const WorkExperience = {
     return result.rows;
   },
 
-  // Find work experience by ID
-  findById: async (id) => {
+  // Get work experience by ID
+  getById: async (id) => {
     const result = await pool.query(
       'SELECT * FROM work_experience WHERE experience_id = $1',
       [id]

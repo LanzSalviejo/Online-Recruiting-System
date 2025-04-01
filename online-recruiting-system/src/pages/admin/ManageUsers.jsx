@@ -181,8 +181,6 @@ const ManageUsers = () => {
         return nameA.localeCompare(nameB);
       });
     } else if (sortBy === 'recent') {
-      // In a real application, you might sort by last login date
-      // For this example, we'll just use creation date
       return filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
     

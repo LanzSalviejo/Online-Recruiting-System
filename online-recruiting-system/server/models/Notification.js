@@ -1,8 +1,5 @@
 const pool = require('../config/db');
 
-/**
- * Notification model with methods for CRUD operations
- */
 const Notification = {
   /**
    * Create a new notification

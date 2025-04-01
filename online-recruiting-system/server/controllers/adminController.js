@@ -97,8 +97,6 @@ exports.getAllUsers = async (req, res) => {
     } else if (sort === 'alphabetical') {
       queryText += ` ORDER BY last_name ASC, first_name ASC`;
     } else if (sort === 'recent') {
-      // In a real application with login tracking, you might sort by last login date
-      // For now, we'll just sort by creation date
       queryText += ` ORDER BY created_at DESC`;
     }
     

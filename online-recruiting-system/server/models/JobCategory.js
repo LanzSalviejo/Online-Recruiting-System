@@ -1,9 +1,5 @@
 const pool = require('../config/db');
 
-/**
- * JobCategory model for PostgreSQL
- * Uses Data Access Object (DAO) pattern
- */
 const JobCategory = {
   /**
    * Find all job categories

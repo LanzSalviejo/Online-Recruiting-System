@@ -108,7 +108,7 @@ const AdminDashboard = ({ user }) => {
 
   // Handle approve/reject HR account
   const handleApproval = (id, approved) => {
-    // In a real application, you would call your API
+    // application, you would call your API
     console.log(`${approved ? 'Approving' : 'Rejecting'} HR account with ID: ${id}`);
     
     // Update local state to remove the processed approval
